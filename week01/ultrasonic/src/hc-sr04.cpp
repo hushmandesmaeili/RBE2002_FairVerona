@@ -86,7 +86,7 @@ void loop()
 {
   //schedule pings roughly every PING_INTERVAL milliseconds
   uint32_t currTime = millis();
-  if((currTime - lastPing) >= PING_INTERVAL && pulseState == PLS_IDLE)
+  if((currTime - lastPing) >= PING_INTERVAL && pulseState == PLS_IDLE && sampleCount < 200)
   {
     lastPing = currTime;
     CommandPing(trigPin); //command a ping
