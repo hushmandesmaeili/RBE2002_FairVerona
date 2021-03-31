@@ -86,7 +86,7 @@ void loop()
 {
   //schedule pings roughly every PING_INTERVAL milliseconds
   uint32_t currTime = millis();
-  if((currTime - lastPing) >= PING_INTERVAL && pulseState == PLS_IDLE && sampleCount <= 201)
+  if((currTime - lastPing) >= PING_INTERVAL && pulseState == PLS_IDLE)
   {
     lastPing = currTime;
     CommandPing(trigPin); //command a ping
@@ -113,7 +113,7 @@ void loop()
     //EDIT THIS LINE: convert pulseLengthTimerCounts, which is in timer counts, to time, in us
     //You'll need the clock frequency and the pre-scaler to convert timer counts to time
     
-    uint32_t pulseLengthUS = (pulseLengthTimerCounts * (float)(64.0 / 16000000.0) * 1000000); //pulse length in us
+    uint32_t pulseLengthUS = (pulseLengthTimerCounts * 4); //pulse length in us
 
 
     //EDIT THIS LINE AFTER YOU CALIBRATE THE SENSOR: put your formula in for converting us -> cm
