@@ -30,6 +30,8 @@ const uint8_t trigPin = 14;
 uint32_t lastPing = 0;
 const uint32_t PING_INTERVAL = 100; //ms
 
+uint8_t sampleCount = 0;
+
 /*
  * Commands the ultrasonic to take a reading
  */
@@ -59,6 +61,8 @@ void setup()
   Serial.println("setup");
 
   noInterrupts(); //disable interupts while we mess with the control registers
+
+  sampleCount = 0;
   
   //sets timer 3 to normal mode (16-bit, fast counter)
   TCCR3A = 0; 
@@ -82,7 +86,7 @@ void loop()
 {
   //schedule pings roughly every PING_INTERVAL milliseconds
   uint32_t currTime = millis();
-  if((currTime - lastPing) >= PING_INTERVAL && pulseState == PLS_IDLE)
+  if((currTime - lastPing) >= PING_INTERVAL && pulseState == PLS_IDLE && sampleCount <= 201)
   {
     lastPing = currTime;
     CommandPing(trigPin); //command a ping
@@ -90,6 +94,9 @@ void loop()
   
   if(pulseState == PLS_CAPTURED) //we got an echo
   {
+
+    sampleCount++;
+
     //update the state to IDLE
     pulseState = PLS_IDLE;
 
@@ -106,12 +113,14 @@ void loop()
     //EDIT THIS LINE: convert pulseLengthTimerCounts, which is in timer counts, to time, in us
     //You'll need the clock frequency and the pre-scaler to convert timer counts to time
     
-    uint32_t pulseLengthUS = 0; //pulse length in us
+    uint32_t pulseLengthUS = (pulseLengthTimerCounts * (float)(64.0 / 16000000.0) * 1000000); //pulse length in us
 
 
     //EDIT THIS LINE AFTER YOU CALIBRATE THE SENSOR: put your formula in for converting us -> cm
-    float distancePulse = 0;    //distance in cm
+    float distancePulse = pulseLengthUS / 58.0;    //distance in cm
 
+    Serial.print(sampleCount);
+    Serial.print('\t');
     Serial.print(millis());
     Serial.print('\t');
     Serial.print(pulseLengthTimerCounts);
