@@ -13,6 +13,7 @@
  */
 
 #include <Arduino.h>
+#include <stdio.h>
 
 volatile uint16_t pulseStart = 0;
 volatile uint16_t pulseEnd = 0;
@@ -30,7 +31,11 @@ const uint8_t trigPin = 14;
 uint32_t lastPing = 0;
 const uint32_t PING_INTERVAL = 100; //ms
 
+//count to keep track of sample number
 uint8_t sampleCount = 0;
+
+//array to store last five samples
+float lastSamples[5];
 
 /*
  * Commands the ultrasonic to take a reading
@@ -52,6 +57,56 @@ void CommandPing(int trigPin)
   digitalWrite(trigPin, HIGH); //command a ping by bringing TRIG HIGH
   delayMicroseconds(10);      //we'll allow a delay here for convenience; it's only 10 us
   digitalWrite(trigPin, LOW);  //must bring the TRIG pin back LOW to get it to send a ping
+}
+
+/*
+ * Returns the rolling average of array passed as argument
+ */
+float RollingAverage(float arr[5]) 
+{
+  float avg = 0;
+  float sum = 0;
+  
+  int i;
+  for (i = 0; i < 5; i++)
+    sum += arr[i];
+
+  //if condition to check if first 5 samples to adjust denominator in average calculation
+  if (sampleCount > 5)
+    avg = sum / 5;
+  else
+    avg = sum / sampleCount;
+
+  return avg;
+}
+
+/*
+ * Returns the rolling median of array passed as argument
+ */
+float RollingMedian(float arr[5]) 
+{
+  float median;
+  float sortedArray[5];
+  
+  //take copy of array passed as argument, copy of array is called sortedArray
+  int i, j;
+  for (i = 0; i < 5; i++)
+    sortedArray[i] = arr[i];
+
+  //bubble sort of sortedArray
+  for (i = 0; i < (5 - 1); i++)
+    for (j = 0; j < (5-i-1); j++) 
+      if (sortedArray[j] > sortedArray[j+1])
+      {
+        float temp = sortedArray[j];
+        sortedArray[j] = sortedArray[j+1];
+        sortedArray[j+1] = temp;
+      }
+
+  //median is the middle value of sortedArray, i.e. index 2
+  median = sortedArray[2];
+
+  return median;
 }
 
 void setup()
@@ -95,6 +150,7 @@ void loop()
   if(pulseState == PLS_CAPTURED) //we got an echo
   {
 
+    //increment sample count
     sampleCount++;
 
     //update the state to IDLE
@@ -118,6 +174,12 @@ void loop()
 
     //EDIT THIS LINE AFTER YOU CALIBRATE THE SENSOR: put your formula in for converting us -> cm
     float distancePulse = pulseLengthUS / 58.0;    //distance in cm
+    
+    //store distancePulse to lastSamples array, using circular indexing for last five samples
+    lastSamples[sampleCount % 5] = distancePulse;
+
+    float rollAvg = RollingAverage(lastSamples);
+    float rollMed = RollingMedian(lastSamples);
 
     Serial.print(sampleCount);
     Serial.print('\t');
@@ -128,6 +190,10 @@ void loop()
     Serial.print(pulseLengthUS);
     Serial.print('\t');
     Serial.print(distancePulse);
+    Serial.print('\t');
+    Serial.print(rollAvg);
+    Serial.print('\t');
+    Serial.print(rollMed);
     Serial.print('\n');
   }
 }
