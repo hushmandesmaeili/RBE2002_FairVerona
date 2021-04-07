@@ -13,6 +13,7 @@
 Romi32U4ButtonA buttonA;
 
 PIDController leftMotorController(1); //start with  Kp = 1
+// PIDController righhtMotorController(1); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows
 
 Romi32U4Motors motors;
@@ -39,7 +40,7 @@ void setup()
    * EDIT THE LINE BELOW WITH YOUR VALUE FOR TOP
    */
 
-  OCR4C = ?????????????????????????????;   //TOP goes in OCR4C 
+  OCR4C = 221;   //TOP goes in OCR4C 
 
   TIMSK4 = 0x04; //enable overflow interrupt
   
@@ -49,12 +50,14 @@ void setup()
 }
 
 float targetLeft = 0;
+// float targetRight = 0;
 
 void loop() 
 {    
   if(buttonA.getSingleDebouncedPress())
   {
     targetLeft = targetLeft < 40 ? 50 : 25;
+    // targetRight = targetRight < 40 ? 50 : 25;
   }
   
   if(PIDController::readyToPID) //timer flag set
@@ -64,6 +67,7 @@ void loop()
     
     // for tracking previous counts
     static int16_t prevLeft = 0;
+    // static int16_t prevRight = 0;
 
     /*
      * Do PID stuffs here. Note that we turn off interupts while we read countsLeft/Right
@@ -74,12 +78,19 @@ void loop()
     int16_t speedLeft = countsLeft - prevLeft;
     prevLeft = countsLeft;
 
+    // int16_t speedRight = countsRight - prevRight;
+    // prevRight = countsRight;
+
     interrupts();
 
     int16_t errorLeft = targetLeft - speedLeft; //calculate the error
     float effortLeft = leftMotorController.ComputeEffort(errorLeft); //calculate effort from error
+
+    // int16_t errorRight = targetRight - speedRight; //calculate the error
+    // float effortRight = rightMotorController.ComputeEffort(errorRight); //calculate effort from error
     
     motors.setEfforts(effortLeft, 0); 
+    // motors.setEfforts(effortLeft, errorRight); 
 
     Serial.print(millis());
     Serial.print('\t');

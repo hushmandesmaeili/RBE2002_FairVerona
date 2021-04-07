@@ -14,7 +14,16 @@ float PIDController::ComputeEffort(float error)
 
     currError = error; //store the current error
 
-    currEffort = Kp * currError;
+    float delta = currError - prevError; //calculate and store delta error
+
+    if(abs(sumError) < errorBound) 
+        sumError += currError;
+    else 
+        sumError = 0;
+
+    prevError = currError;
+
+    currEffort = Kp * currError + Ki * sumError + Kd * delta;
 
     return currEffort;
 }
