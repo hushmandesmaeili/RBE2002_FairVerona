@@ -16,10 +16,13 @@ float PIDController::ComputeEffort(float error)
 
     float delta = currError - prevError; //calculate and store delta error
 
-    if(abs(sumError) < errorBound) 
-        sumError += currError;
-    else 
-        sumError = 0;
+    sumError += currError;
+
+    if(sumError > errorBound){
+        sumError = errorBound;
+    } else if (sumError < (-1*errorBound)){
+        sumError = (-1*errorBound);
+    }
 
     prevError = currError;
 

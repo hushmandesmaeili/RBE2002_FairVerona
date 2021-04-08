@@ -12,7 +12,7 @@
 
 Romi32U4ButtonA buttonA;
 
-PIDController leftMotorController(1); //start with  Kp = 1
+PIDController leftMotorController(12, 1, 0, 300); //start with  Kp = 1
 // PIDController righhtMotorController(1); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows
 
@@ -46,17 +46,19 @@ void setup()
   
   interrupts(); //re-enable interrupts
 
-  pinMode(6, OUTPUT); //COMMENT THIS OUT TO SHUT UP THE PIEZO!!!
+  // pinMode(6, OUTPUT); //COMMENT THIS OUT TO SHUT UP THE PIEZO!!!
 }
 
-float targetLeft = 0;
+float targetLeft = 15; //max speed is around 75
 // float targetRight = 0;
 
 void loop() 
 {    
   if(buttonA.getSingleDebouncedPress())
   {
-    targetLeft = targetLeft < 40 ? 50 : 25;
+    targetLeft += 15;
+    if(targetLeft > 300) targetLeft = 300;
+    // targetLeft = targetLeft < 40 ? 50 : 25;
     // targetRight = targetRight < 40 ? 50 : 25;
   }
   
@@ -92,15 +94,15 @@ void loop()
     motors.setEfforts(effortLeft, 0); 
     // motors.setEfforts(effortLeft, errorRight); 
 
-    Serial.print(millis());
-    Serial.print('\t');
+    // Serial.print(millis());
+    // Serial.print('\t');
     Serial.print(targetLeft);
     Serial.print('\t');
     Serial.print(speedLeft);
     Serial.print('\t');
     Serial.print(effortLeft/10.0); //divide effort by 10 for better plotting
 
-    //you may want to add more serial printout here for testing
+    // //you may want to add more serial printout here for testing
 
     Serial.print('\n');
   }
