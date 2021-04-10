@@ -10,12 +10,12 @@ bool reflectance::both(){
 }
 
 void reflectance::set() {
-Serial.begin(115200);
+// Serial.begin(115200);
 int sensorLeft(analogRead(A3));
 int sensorRight(analogRead(A2));
-Serial.print(sensorLeft);
-Serial.print(",");
-Serial.println(sensorRight);
+// Serial.print(sensorLeft);
+// Serial.print(",");
+// Serial.println(sensorRight);
 }
 
 

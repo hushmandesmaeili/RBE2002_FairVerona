@@ -10,14 +10,17 @@
 #include "serial_comm.h"
 #include "PIDcontroller.h"
 #include "ourTimer.h"
+#include <reflectance.h>
 
 Romi32U4ButtonA buttonA;
+reflectance lineSensor;
 
 PIDController leftMotorController(12, 1, 0, 300); //start with  Kp = 1
 PIDController rightMotorController(12, 1, 0, 300); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows
 
 PIDController wallFollow(1, 0.1, 1, 75); //wall follow controller
+// PIDController wallFollow(0.9, 0, 0, 0); //wall follow controller
 ourTimer wallFollowTimer(100); //every 100ms
 
 volatile uint16_t pulseStart = 0;
@@ -30,7 +33,7 @@ enum PULSE_STATE {PLS_IDLE, PLS_WAITING_LOW, PLS_WAITING_HIGH, PLS_CAPTURED};
 volatile PULSE_STATE pulseState = PLS_IDLE;
 
 //this may be most any pin, connect the pin to Trig on the sensor
-const uint8_t trigPin = 14;
+const uint8_t trigPin = 18;
 
 // const float VREF = 5.0;
 float lastSamples[5];
@@ -84,6 +87,9 @@ void setup()
   pinMode(trigPin, OUTPUT);
   pinMode(13, INPUT); //explicitly make 13 an input
 
+  wallFollowTimer.reset();
+  lineSensor.setup();
+
 }
 
 float targetLeft = 15; //max speed is around 75
@@ -134,16 +140,8 @@ float rollingAverage(float arr[5])
 
 void loop() 
 {    
-  if(buttonA.getSingleDebouncedPress())
-  {
-    // targetLeft += 15;
-    // if(targetLeft > 300) targetLeft = 300;
-    // // targetLeft = targetLeft < 40 ? 50 : 25;
-    // targetRight = targetRight < 40 ? 50 : 25;
-  }
   
-  if(wallFollowTimer.isExpired() && pulseState == PLS_IDLE) { //for using Ultrasonic
-
+  if (wallFollowTimer.isExpired() && pulseState == PLS_IDLE) { //for using Ultrasonic
     CommandPing(trigPin); //command a ping
   }
 
@@ -225,7 +223,7 @@ void loop()
    * denoted by a newline character ('\n'). Be sure to set your Serial Monitor to 
    * append a newline
    */
-  if(CheckSerialInput()) {ParseSerialInput();}
+  // if(CheckSerialInput()) {ParseSerialInput();}
 }
 
 /*
