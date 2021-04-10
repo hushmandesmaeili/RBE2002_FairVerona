@@ -108,6 +108,7 @@ void loop()
 { 
   switch(state){
     case IDLE:
+    lineSensor.set();
       motors.setEfforts(0, 0);
       if(buttonA.getSingleDebouncedPress()){
         if(lastState == IDLE){
