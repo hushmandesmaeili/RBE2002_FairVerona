@@ -138,105 +138,143 @@ float rollingAverage(float arr[5])
   return avg;
 }
 
+typedef enum {
+  IDLE,
+  WAITING,
+  WALLING
+} State;
+State state = IDLE;
+State lastState = IDLE;
+
+uint32_t waitStart = 0;
+
 void loop() 
-{    
+{
+  switch(state){
+    case IDLE:
+      motors.setEfforts(0, 0);
+      if(buttonA.getSingleDebouncedPress()){
+        if(lastState == IDLE){
+          state = WAITING;
+          lastState = IDLE;
+          waitStart = millis();
+        } else {
+          state = WALLING;
+          lastState = IDLE;
+        }
+      }
+    break;
+    case WAITING:
+      if(millis() - waitStart >= 1000){
+        state = WALLING;
+        lastState = IDLE;
+      }
+    break;
+    case WALLING:
+      if(lineSensor.both()){
+        state = IDLE;
+        lastState = WALLING;
+        break;
+      }
   
-  if (wallFollowTimer.isExpired() && pulseState == PLS_IDLE) { //for using Ultrasonic
-    CommandPing(trigPin); //command a ping
+      if (wallFollowTimer.isExpired() && pulseState == PLS_IDLE) { //for using Ultrasonic
+        CommandPing(trigPin); //command a ping
+      }
+
+      if(pulseState == PLS_CAPTURED) //we got an echo
+      {
+
+        //increment sample count
+        sampleCount++;
+
+        //update the state to IDLE
+        pulseState = PLS_IDLE;
+
+        /*
+        * Calculate the length of the pulse (in timer counts!). Note that we turn off
+        * interrupts for a VERY short period so that there is no risk of the ISR changing
+        * pulseEnd or pulseStart. The way the state machine works, this wouldn't 
+        * really be a problem, but best practice is to ensure that no side effects can occur.
+        */
+        noInterrupts();
+        uint16_t pulseLengthTimerCounts = pulseEnd - pulseStart;
+        interrupts();
+        
+        //EDIT THIS LINE: convert pulseLengthTimerCounts, which is in timer counts, to time, in us
+        //You'll need the clock frequency and the pre-scaler to convert timer counts to time
+        
+        uint32_t pulseLengthUS = (pulseLengthTimerCounts * 4); //pulse length in us
+
+
+        //EDIT THIS LINE AFTER YOU CALIBRATE THE SENSOR: put your formula in for converting us -> cm
+        float distancePulse = pulseLengthUS / 58.0;    //distance in cm
+        
+        //store distancePulse to lastSamples array, using circular indexing for last five samples
+        lastSamples[sampleCount % 5] = distancePulse;
+
+        // float avg_distance = rollingAverage(lastSamples);
+        
+        // float error = avg_distance - targetDistance;
+        float error = distancePulse - targetDistance;
+
+        turnEffort = wallFollow.ComputeEffort(error);
+        targetLeft =  targetSpeed - turnEffort;
+        targetRight = targetSpeed + turnEffort;
+      }
+
+      if(PIDController::readyToPID) //timer flag set
+      {
+        // reset the flag
+        PIDController::readyToPID = 0;
+        
+        // for tracking previous counts
+        static int16_t prevLeft = 0;
+        static int16_t prevRight = 0;
+
+        /*
+        * Do PID stuffs here. Note that we turn off interupts while we read countsLeft/Right
+        * so that it won't get accidentally updated (in the ISR) while we're reading it.
+        */
+        noInterrupts();
+
+        int16_t speedLeft = countsLeft - prevLeft;
+        prevLeft = countsLeft;
+
+        int16_t speedRight = countsRight - prevRight;
+        prevRight = countsRight;
+
+        interrupts();
+
+        int16_t errorLeft = targetLeft - speedLeft; //calculate the error
+        float effortLeft = leftMotorController.ComputeEffort(errorLeft); //calculate effort from error
+
+        int16_t errorRight = targetRight - speedRight; //calculate the error
+        float effortRight = rightMotorController.ComputeEffort(errorRight); //calculate effort from error
+        
+        motors.setEfforts(effortLeft, effortRight); 
+      }
+
+      /* for reading in gain settings
+      * CheckSerialInput() returns true when it gets a complete string, which is
+      * denoted by a newline character ('\n'). Be sure to set your Serial Monitor to 
+      * append a newline
+      */
+      // if(CheckSerialInput()) {ParseSerialInput();}
+      break;
   }
-
-  if(pulseState == PLS_CAPTURED) //we got an echo
-  {
-
-    //increment sample count
-    sampleCount++;
-
-    //update the state to IDLE
-    pulseState = PLS_IDLE;
-
-    /*
-     * Calculate the length of the pulse (in timer counts!). Note that we turn off
-     * interrupts for a VERY short period so that there is no risk of the ISR changing
-     * pulseEnd or pulseStart. The way the state machine works, this wouldn't 
-     * really be a problem, but best practice is to ensure that no side effects can occur.
-     */
-    noInterrupts();
-    uint16_t pulseLengthTimerCounts = pulseEnd - pulseStart;
-    interrupts();
-    
-    //EDIT THIS LINE: convert pulseLengthTimerCounts, which is in timer counts, to time, in us
-    //You'll need the clock frequency and the pre-scaler to convert timer counts to time
-    
-    uint32_t pulseLengthUS = (pulseLengthTimerCounts * 4); //pulse length in us
-
-
-    //EDIT THIS LINE AFTER YOU CALIBRATE THE SENSOR: put your formula in for converting us -> cm
-    float distancePulse = pulseLengthUS / 58.0;    //distance in cm
-    
-    //store distancePulse to lastSamples array, using circular indexing for last five samples
-    lastSamples[sampleCount % 5] = distancePulse;
-
-    // float avg_distance = rollingAverage(lastSamples);
-    
-    // float error = avg_distance - targetDistance;
-    float error = distancePulse - targetDistance;
-
-    turnEffort = wallFollow.ComputeEffort(error);
-    targetLeft =  targetSpeed - turnEffort;
-    targetRight = targetSpeed + turnEffort;
-  }
-
-  if(PIDController::readyToPID) //timer flag set
-  {
-    // reset the flag
-    PIDController::readyToPID = 0;
-    
-    // for tracking previous counts
-    static int16_t prevLeft = 0;
-    static int16_t prevRight = 0;
-
-    /*
-     * Do PID stuffs here. Note that we turn off interupts while we read countsLeft/Right
-     * so that it won't get accidentally updated (in the ISR) while we're reading it.
-     */
-    noInterrupts();
-
-    int16_t speedLeft = countsLeft - prevLeft;
-    prevLeft = countsLeft;
-
-    int16_t speedRight = countsRight - prevRight;
-    prevRight = countsRight;
-
-    interrupts();
-
-    int16_t errorLeft = targetLeft - speedLeft; //calculate the error
-    float effortLeft = leftMotorController.ComputeEffort(errorLeft); //calculate effort from error
-
-    int16_t errorRight = targetRight - speedRight; //calculate the error
-    float effortRight = rightMotorController.ComputeEffort(errorRight); //calculate effort from error
-    
-    motors.setEfforts(effortLeft, effortRight); 
-  }
-
-  /* for reading in gain settings
-   * CheckSerialInput() returns true when it gets a complete string, which is
-   * denoted by a newline character ('\n'). Be sure to set your Serial Monitor to 
-   * append a newline
-   */
-  // if(CheckSerialInput()) {ParseSerialInput();}
 }
 
-/*
- * ISR for timing. On overflow, it takes a 'snapshot' of the encoder counts and raises a flag to let
- * the main program it is time to execute the PID calculations.
- */
+  /*
+  * ISR for timing. On overflow, it takes a 'snapshot' of the encoder counts and raises a flag to let
+  * the main program it is time to execute the PID calculations.
+  */
 ISR(TIMER4_OVF_vect)
 {
-  //Capture a "snapshot" of the encoder counts for later processing
-  countsLeft = encoders.getCountsLeft();
-  countsRight = encoders.getCountsRight();
+    //Capture a "snapshot" of the encoder counts for later processing
+    countsLeft = encoders.getCountsLeft();
+    countsRight = encoders.getCountsRight();
 
-  PIDController::readyToPID = 1;
+    PIDController::readyToPID = 1;
 }
 
 /*
