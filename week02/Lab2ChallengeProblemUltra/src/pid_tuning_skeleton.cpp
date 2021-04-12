@@ -19,7 +19,7 @@ PIDController leftMotorController(12, 1, 0, 300); //start with  Kp = 1
 PIDController rightMotorController(12, 1, 0, 300); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows
 
-PIDController wallFollow(1, 0.1, 1, 75); //wall follow controller
+PIDController wallFollow(1, 0.0, 1, 75); //wall follow controller
 // PIDController wallFollow(0.9, 0, 0, 0); //wall follow controller
 ourTimer wallFollowTimer(100); //every 100ms
 
