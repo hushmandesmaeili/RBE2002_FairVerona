@@ -195,8 +195,8 @@ void loop()
       * append a newline
       */
       if(CheckSerialInput()) {ParseSerialInput();}
-        break;
-      }
+    break;
+  }
 }
 
 /*
