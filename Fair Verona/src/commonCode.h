@@ -9,10 +9,9 @@
 
 class commonCode{
     public:
+        Chassis chassis;
+
         void setup();
         void loop();
-        int getRightEffort();
-        int getLeftEffort();
     private:
-        Chassis chassis;
 };
