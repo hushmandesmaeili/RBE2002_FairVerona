@@ -57,8 +57,8 @@ void loop()
   if(buttonA.getSingleDebouncedPress())
   {
     targetLeft += 15;
-    // if(targetLeft > 300) targetLeft = 300;
-    targetLeft = targetLeft < 40 ? 50 : 25;
+    if(targetLeft > 300) targetLeft = 300;
+    // targetLeft = targetLeft < 40 ? 50 : 25;
     // targetRight = targetRight < 40 ? 50 : 25;
   }
   
