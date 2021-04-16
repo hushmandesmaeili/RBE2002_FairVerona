@@ -106,6 +106,32 @@ void Chassis::UpdateSpeeds(void)
     Serial.print("\n");
 }
 
+void Chassis::UpdatePose()
+{
+    float angVel = (speedRight - speedLeft) / wheel_track;
+    float speedCenter = (speedRight+speedLeft) / 2;
+    float oldTheta = theta;
+    theta = oldTheta + angVel;
+    float thetaStar = (oldTheta + theta) / 2;
+    x += speedCenter * cos(thetaStar);
+    y += speedCenter * sin(thetaStar);
+}
+
+void Chassis:: MoveToPoint()
+{
+
+    float errorDistance = sqrt(pow((x-x_target),2)+ pow((y-y_target),2));
+    float internalTargetTheta = atan2(y_target-y,x_target-x);
+    float errorTheta =  internalTargetTheta - theta;
+
+    targetSpeedLeft= kpD * errorDistance + kpTheta * errorTheta;
+
+}
+bool Chassis:: AreWeThere()
+{
+    return (abs(x-x_target)<=BUFFER && abs(y-y_target)<=BUFFER);
+}
+
 /*
  * ISR for timing. On overflow, it takes a 'snapshot' of the encoder counts and raises a flag to let
  * the main program it is time to execute the PID calculations.

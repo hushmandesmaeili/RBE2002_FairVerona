@@ -8,14 +8,21 @@ class Chassis
 {
 private:
     //parameters -- these will need to be updated after you do your experiments
-    float wheel_track = 14.9; //cm
-    float wheel_diam = 7.0; //cm
+    float wheel_track = 15.2; //cm
+    float wheel_diam = 7.085; //cm
     float ticks_per_rotation = 1440; // from the datasheet
+
+    // constants to control speed of the wheels for inverse kinematics
+    float kpD = 1;
+    float kpTheta = 1;
 
     //current Pose
     float x = 0;
     float y = 0;
     float theta = 0;
+
+    //
+    const int BUFFER = 5;
 
     //current target
     float x_target = 0;
@@ -48,6 +55,8 @@ public:
     void SetTargetPosition(float xt, float yt) { x_target = xt; y_target = yt; }
     void UpdatePose(void);
     void UpdateSpeeds(void);
+    void MoveToPoint(void);
+    bool AreWeThere(void);
 };
 
 #endif
