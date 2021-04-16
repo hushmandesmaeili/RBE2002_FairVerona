@@ -49,22 +49,22 @@ void HandleTimerExpired(void)
       case DR_WAITING:
         if(destination == DEST_A) //drive straight
         {
-          chassis.SetTargetSpeeds(1, 1);  //YOU'LL WANT TO CHANGE THESE
-          waitTimer.reset(1000);          //YOU'LL WANT TO CHANGE THESE
+          chassis.SetTargetSpeeds(12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
+          waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
 
           state = DR_DRIVING;
         }
         else if(destination == DEST_B) //spin in place
         {
-          chassis.SetTargetSpeeds(1, 1);  //YOU'LL WANT TO CHANGE THESE
-          waitTimer.reset(1000);          //YOU'LL WANT TO CHANGE THESE
+          chassis.SetTargetSpeeds(-12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
+          waitTimer.reset(4000);          //YOU'LL WANT TO CHANGE THESE
 
           state = DR_DRIVING;
         }
         else if(destination == DEST_C) //curl
         {
-          chassis.SetTargetSpeeds(1, 1);  //YOU'LL WANT TO CHANGE THESE
-          waitTimer.reset(1000);          //YOU'LL WANT TO CHANGE THESE
+          chassis.SetTargetSpeeds(8.8, 13.2);  //YOU'LL WANT TO CHANGE THESE
+          waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
 
           state = DR_DRIVING;
         }

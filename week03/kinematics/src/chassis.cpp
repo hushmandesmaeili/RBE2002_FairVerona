@@ -63,14 +63,14 @@ void Chassis::UpdatePose(void)
     y += 0;
     theta += 0;
 
-    Serial.print(millis());
-    Serial.print('\t');
-    Serial.print(x);
-    Serial.print('\t');
-    Serial.print(y);
-    Serial.print('\t');
-    Serial.print(theta); 
-    Serial.print('\n');
+    // Serial.print(millis());
+    // Serial.print('\t');
+    // Serial.print(x);
+    // Serial.print('\t');
+    // Serial.print(y);
+    // Serial.print('\t');
+    // Serial.print(theta); 
+    // Serial.print('\n');
 }
 
 void Chassis::UpdateSpeeds(void)
@@ -96,7 +96,14 @@ void Chassis::UpdateSpeeds(void)
     int16_t errorRight = targetSpeedRight - speedRight; //calculate the error
     float effortRight = rightMotorController.ComputeEffort(errorRight); //calculate effort from error
     
-    motors.setRightEffort(effortRight); 
+    motors.setRightEffort(effortRight);
+
+    Serial.print(millis());
+    Serial.print("\t");
+    Serial.print(speedLeft);
+    Serial.print("\t");
+    Serial.print(speedRight);
+    Serial.print("\n");
 }
 
 /*
