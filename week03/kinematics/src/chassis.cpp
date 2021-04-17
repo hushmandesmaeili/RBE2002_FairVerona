@@ -108,28 +108,29 @@ void Chassis::UpdateSpeeds(void)
 
 void Chassis::UpdatePose()
 {
-    float angVel = (speedRight - speedLeft) / wheel_track;
-    float speedCenter = (speedRight+speedLeft) / 2;
+    float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
+    float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
+    float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
     float oldTheta = theta;
     theta = oldTheta + angVel;
-    float thetaStar = (oldTheta + theta) / 2;
-    x += speedCenter * cos(thetaStar);
-    y += speedCenter * sin(thetaStar);
+    float thetaStar = (oldTheta + theta) / 2.0;
+    x += speedCenter * cos(thetaStar); //in cm
+    y += speedCenter * sin(thetaStar); //in cm
 }
 
-void Chassis:: MoveToPoint()
+void Chassis::MoveToPoint(void)
 {
 
-    float errorDistance = sqrt(pow((x-x_target),2)+ pow((y-y_target),2));
-    float internalTargetTheta = atan2(y_target-y,x_target-x);
+    float errorDistance = sqrt(pow((x - x_target), 2) + pow((y - y_target), 2));
+    float internalTargetTheta = atan2(y_target - y, x_target - x);
     float errorTheta =  internalTargetTheta - theta;
 
     targetSpeedLeft= kpD * errorDistance + kpTheta * errorTheta;
 
 }
-bool Chassis:: AreWeThere()
+bool Chassis::AreWeThere(void)
 {
-    return (abs(x-x_target)<=BUFFER && abs(y-y_target)<=BUFFER);
+    return (abs(x - x_target) <= BUFFER && abs(y - y_target) <= BUFFER);
 }
 
 /*
