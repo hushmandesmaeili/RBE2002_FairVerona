@@ -39,39 +39,39 @@ void Chassis::Init(void)
     //pinMode(6, OUTPUT); //COMMENT THIS OUT TO SHUT UP THE PIEZO!!!
 }
 
-void Chassis::UpdatePose(void)
-{
-    //TO BE COMPLETED BY THE STUDENT
+// void Chassis::UpdatePose(void)
+// {
+//     //TO BE COMPLETED BY THE STUDENT
 
-    //conversion from ticks/interval to cm/sec
-    float conversionToCMPerSec = 1; //YOU'LL NEED TO CALCULATE THIS VALUE
+//     //conversion from ticks/interval to cm/sec
+//     float conversionToCMPerSec = 1; //YOU'LL NEED TO CALCULATE THIS VALUE
     
-    float spLeft = speedLeft * conversionToCMPerSec;
-    float spRight = speedRight * conversionToCMPerSec;
+//     float spLeft = speedLeft * conversionToCMPerSec;
+//     float spRight = speedRight * conversionToCMPerSec;
 
-    //average speed
-    float u_0 = 0; //YOU'LL NEED TO ADD THIS EXPRESSION
+//     //average speed
+//     float u_0 = 0; //YOU'LL NEED TO ADD THIS EXPRESSION
 
-    //omega
-    float omega = 0; //YOU'LL NEED TO ADD THIS EXPRESSION
+//     //omega
+//     float omega = 0; //YOU'LL NEED TO ADD THIS EXPRESSION
 
-    //simple first-order method -- not sufficient for class
-    float dt = timestepMS / 1000.; //SET timestepMS IN THE CONSTRUCTOR
+//     //simple first-order method -- not sufficient for class
+//     float dt = timestepMS / 1000.; //SET timestepMS IN THE CONSTRUCTOR
 
-    //YOU'LL NEED TO CALCULATE THESE
-    x += 0;
-    y += 0;
-    theta += 0;
+//     //YOU'LL NEED TO CALCULATE THESE
+//     x += 0;
+//     y += 0;
+//     theta += 0;
 
-    // Serial.print(millis());
-    // Serial.print('\t');
-    // Serial.print(x);
-    // Serial.print('\t');
-    // Serial.print(y);
-    // Serial.print('\t');
-    // Serial.print(theta); 
-    // Serial.print('\n');
-}
+//     // Serial.print(millis());
+//     // Serial.print('\t');
+//     // Serial.print(x);
+//     // Serial.print('\t');
+//     // Serial.print(y);
+//     // Serial.print('\t');
+//     // Serial.print(theta); 
+//     // Serial.print('\n');
+// }
 
 void Chassis::UpdateSpeeds(void)
 {
@@ -98,17 +98,17 @@ void Chassis::UpdateSpeeds(void)
     
     motors.setRightEffort(effortRight);
 
-    Serial.print(millis());
-    Serial.print("\t");
-    Serial.print(speedLeft);
-    Serial.print("\t");
-    Serial.print(speedRight);
-    Serial.print("\n");
+//     Serial.print(millis());
+//     Serial.print("\t");
+//     Serial.print(speedLeft);
+//     Serial.print("\t");
+//     Serial.print(speedRight);
+//     Serial.print("\n");
 }
 
-void Chassis::UpdatePose()
-{
+void Chassis::UpdatePose() {
     float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
+    // float dt = timestepMS / 1000; 
     float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
     float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
     float oldTheta = theta;
@@ -116,17 +116,19 @@ void Chassis::UpdatePose()
     float thetaStar = (oldTheta + theta) / 2.0;
     x += speedCenter * cos(thetaStar); //in cm
     y += speedCenter * sin(thetaStar); //in cm
+
+    Serial.print(x);
+    Serial.print("\t");
+    Serial.println(y);
 }
 
-void Chassis::MoveToPoint(void)
-{
-
+void Chassis::MoveToPoint(void) {
     float errorDistance = sqrt(pow((x - x_target), 2) + pow((y - y_target), 2));
     float internalTargetTheta = atan2(y_target - y, x_target - x);
     float errorTheta =  internalTargetTheta - theta;
 
-    targetSpeedLeft= kpD * errorDistance + kpTheta * errorTheta;
-
+    targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
+    targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
 }
 bool Chassis::AreWeThere(void)
 {

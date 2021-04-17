@@ -47,28 +47,37 @@ void HandleTimerExpired(void)
     switch(state)
     {
       case DR_WAITING:
-        if(destination == DEST_A) //drive straight
-        {
-          chassis.SetTargetSpeeds(12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
-          waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
+        if(waitTimer.isExpired()){
+          if(destination == DEST_A) //drive straight
+          {
+            // chassis.SetTargetSpeeds(12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
+            // waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
+            chassis.SetTargetPosition(30.0, 30.0);
 
-          state = DR_DRIVING;
-        }
-        else if(destination == DEST_B) //spin in place
-        {
-          chassis.SetTargetSpeeds(-12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
-          waitTimer.reset(4000);          //YOU'LL WANT TO CHANGE THESE
+            state = DR_DRIVING;
+          }
+          else if(destination == DEST_B) //spin in place
+          {
+          //   chassis.SetTargetSpeeds(-12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
+          //   waitTimer.reset(4000);          //YOU'LL WANT TO CHANGE THESE
 
-          state = DR_DRIVING;
-        }
-        else if(destination == DEST_C) //curl
-        {
-          chassis.SetTargetSpeeds(8.8, 13.2);  //YOU'LL WANT TO CHANGE THESE
-          waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
+            chassis.SetTargetPosition(60.0, 0.0);
+            state = DR_DRIVING;
+          }
+          else if(destination == DEST_C) //curl
+          {
+          //   chassis.SetTargetSpeeds(8.8, 13.2);  //YOU'LL WANT TO CHANGE THESE
+          //   waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
 
-          state = DR_DRIVING;
+            chassis.SetTargetPosition(30.0, -30.0);
+            state = DR_DRIVING;
+          }
         }
-        break;
+      break;
+      case DR_DRIVING:
+        chassis.MoveToPoint();
+        if(chassis.AreWeThere()) state = DR_IDLE;
+      break;
       default:
         chassis.SetTargetSpeeds(0, 0);
         state = DR_IDLE;
@@ -82,6 +91,8 @@ void loop()
   if(buttonB.getSingleDebouncedPress()) HandleButton(DEST_B);
   if(buttonC.getSingleDebouncedPress()) HandleButton(DEST_C);
 
+  HandleTimerExpired();
+
   if(PIDController::readyToPID) //timer flag set
   {
     // reset the flag
@@ -90,5 +101,5 @@ void loop()
     chassis.UpdatePose();
   }
 
-  if(waitTimer.isExpired()) HandleTimerExpired();
+  // if(waitTimer.isExpired()) HandleTimerExpired();
 }

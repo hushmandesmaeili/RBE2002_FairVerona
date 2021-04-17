@@ -13,8 +13,8 @@ private:
     float ticks_per_rotation = 1440; // from the datasheet
 
     // constants to control speed of the wheels for inverse kinematics
-    float kpD = 1;
-    float kpTheta = 1;
+    float kpD = 0.75;
+    float kpTheta = 12;
 
     //current Pose
     float x = 0;
@@ -22,7 +22,7 @@ private:
     float theta = 0;
 
     //
-    const int BUFFER = 5;
+    const int BUFFER = 2;
 
     //current target
     float x_target = 0;
