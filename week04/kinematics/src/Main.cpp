@@ -5,6 +5,8 @@ Romi32U4ButtonB buttonB;
 Romi32U4ButtonC buttonC;
 Chassis chassis;
 
+const int LED_PIN = 17;
+
 bool onRamp = 0; //true if ramp
 float upperLimit = 0.1;
 float lowerLimit = 0.05;
@@ -46,9 +48,11 @@ void stateMachine(){
         break;
         case CLIMBING:
             if(!abovePitch()) state = STOP;
+            digitalWrite(LED_PIN, 1);
         break;
         case STOP:
             chassis.motors.setEfforts(0, 0);
+            digitalWrite(LED_PIN, 0);
             // chassis.SetTargetSpeeds(0, 0);
         break;
     }
@@ -58,7 +62,7 @@ void setup()
 {
    Serial.begin(115200);
    chassis.Init();
-   
+   pinMode(LED_PIN, OUTPUT);
 }
 
 void loop()
