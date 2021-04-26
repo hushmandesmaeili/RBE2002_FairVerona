@@ -55,6 +55,16 @@ private:
     float senseRad = (sensitivity * PI)/(180000); // rads per second per LSB
     const float kappa = 0.5;
 
+    float accXoffset = 0;
+    float accZoffset = 0;
+    int sampleSize = 0; 
+    bool isCalibrating = false;
+
+    float gyroBias = 0;
+    float Bias = 0;
+    const float E = 0.01;
+
+
 public:
     Chassis(void);
     void Init(void);
@@ -65,7 +75,12 @@ public:
     void MoveToPoint(void);
     bool AreWeThere(void);
     bool UpdatePitch(void);
-    
+    void GetXAverage(void);
+    bool IsCalibrating(void);
+    void GetGyroBias(void);
+    float getPitchAng(void);
+    Romi32U4Motors motors;
+
 };
 
 #endif

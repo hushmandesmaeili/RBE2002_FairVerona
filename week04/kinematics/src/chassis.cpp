@@ -6,7 +6,7 @@ volatile int16_t countsLeft = 0;
 volatile int16_t countsRight = 0;
 
 Romi32U4Encoders encoders;
-Romi32U4Motors motors;
+// Romi32U4Motors motors;
 LSM6 imu; 
 
 Chassis::Chassis(void) 
@@ -157,22 +157,71 @@ bool Chassis::AreWeThere(void)
     return (abs(x - x_target) <= BUFFER && abs(y - y_target) <= BUFFER);
 }
 
+void Chassis::GetXAverage(void)
+{
+    if(sampleSize < 200)
+    {
+        isCalibrating = true;
+        if(imu.getStatus() & 0x01)
+        {
+            imu.read();
+            accXoffset += imu.a.x;
+            // accZoffset += imu.a.z;
+            // Serial.print(millis());
+            // Serial.print('\n');
+            // Serial.print(sampleSize);
+            // Serial.print("\t");
+            // Serial.print(imu.a.x);
+            // Serial.print("\n");
+            sampleSize++;
+        }
+    }
+    else if(sampleSize == 200) {
+        accXoffset /= 200.0;
+        // accZoffset /= 200.0;
+        // Serial.print("Average: ");
+        // Serial.print("\t");
+        // Serial.print(accXoffset);
+        // Serial.print("\n");
+        isCalibrating = false;
+    }
+}
+
+bool Chassis::IsCalibrating(void) {
+    return isCalibrating;
+}
+
+float Chassis::getPitchAng(){
+    return(estimatedPitchAng);
+}
+
 bool Chassis::UpdatePitch(void)
 {
-
-
  if(imu.getStatus() & 0x01)
   {
     imu.read();
-    float predictGyro = estimatedPitchAng + (dataRateSec * imu.g.y * senseRad);
-    float obsPitch = atan2((double)(imu.a.x),(double)(imu.a.z));
+    float predictGyro = estimatedPitchAng + (dataRateSec * (imu.g.y - Bias) * senseRad);
+    float obsPitch = atan2((double)(imu.a.x - accXoffset),(double)(imu.a.z));
     estimatedPitchAng = kappa * predictGyro + (1 - kappa) * obsPitch;
+    Bias = Bias + E*(predictGyro - obsPitch);  
 
-    Serial.print(millis());
-    Serial.print('\t');
-    Serial.print(obsPitch);
-    Serial.print('\t');
+    //Serial.print(millis());
+   // Serial.print('\t');
+    // Serial.print(obsPitch);
+    // Serial.print('\t');
+    // Serial.print(predictGyro);
+    // Serial.print('\t');
     Serial.print(estimatedPitchAng);
+    Serial.print('\t');
+    Serial.print(Bias);
+    Serial.print('\t');
+     Serial.print(imu.a.x);
+    Serial.print('\t');
+    Serial.print(accXoffset);
+    Serial.print('\t');
+     Serial.print(imu.a.z);
+    Serial.print('\t');
+    Serial.print(accZoffset);
     Serial.print('\n');
     return true;
 
