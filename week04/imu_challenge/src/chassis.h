@@ -51,7 +51,7 @@ private:
     
     float estimatedPitchAng;
     const float  dataRateSec = 0.077;
-    const float  sensitivity = 35;  //mdps/LSB
+    const float  sensitivity = 35;  //sensitivity of gyro in mdps/LSB
     float senseRad = (sensitivity * PI)/(180000); // rads per second per LSB
     const float kappa = 0.5;
 
@@ -77,7 +77,6 @@ public:
     bool UpdatePitch(void);
     void GetXAverage(void);
     bool IsCalibrating(void);
-    void GetGyroBias(void);
     float getPitchAng(void);
     Romi32U4Motors motors;
 

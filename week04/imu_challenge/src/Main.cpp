@@ -30,7 +30,7 @@ typedef enum {
 State state = WAITFORBUTTON;
 unsigned long startTime = 0;
 
-void stateMachine(){
+void stateMachine() {
     switch(state){
         case WAITFORBUTTON:
             if(buttonC.getSingleDebouncedPress()){
@@ -67,15 +67,10 @@ void setup()
 
 void loop()
 {
-    if(buttonA.getSingleDebouncedPress() || chassis.IsCalibrating())
-    {
+    if(buttonA.getSingleDebouncedPress() || chassis.IsCalibrating()) {
         chassis.GetXAverage();
     } else {
         stateMachine();
         chassis.UpdatePitch();
-        // chassis.UpdateSpeeds();
-    }
-    // Serial.println(state);
-    // Serial.print("\n");
-    
+    } 
 }

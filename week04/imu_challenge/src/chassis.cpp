@@ -120,12 +120,6 @@ void Chassis::UpdateSpeeds(void)
     
     motors.setRightEffort(effortRight);
 
-//     Serial.print(millis());
-//     Serial.print("\t");
-//     Serial.print(speedLeft);
-//     Serial.print("\t");
-//     Serial.print(speedRight);
-//     Serial.print("\n");
 }
 
 void Chassis::UpdatePose() {
@@ -152,48 +146,12 @@ void Chassis::MoveToPoint(void) {
     targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
     targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
 }
+
 bool Chassis::AreWeThere(void)
 {
     return (abs(x - x_target) <= BUFFER && abs(y - y_target) <= BUFFER);
 }
 
-void Chassis::GetXAverage(void)
-{
-    if(sampleSize < 200)
-    {
-        isCalibrating = true;
-        if(imu.getStatus() & 0x01)
-        {
-            imu.read();
-            accXoffset += imu.a.x;
-            // accZoffset += imu.a.z;
-            // Serial.print(millis());
-            // Serial.print('\n');
-            // Serial.print(sampleSize);
-            // Serial.print("\t");
-            // Serial.print(imu.a.x);
-            // Serial.print("\n");
-            sampleSize++;
-        }
-    }
-    else if(sampleSize == 200) {
-        accXoffset /= 200.0;
-        // accZoffset /= 200.0;
-        // Serial.print("Average: ");
-        // Serial.print("\t");
-        // Serial.print(accXoffset);
-        // Serial.print("\n");
-        isCalibrating = false;
-    }
-}
-
-bool Chassis::IsCalibrating(void) {
-    return isCalibrating;
-}
-
-float Chassis::getPitchAng(){
-    return(estimatedPitchAng);
-}
 
 bool Chassis::UpdatePitch(void)
 {
@@ -205,58 +163,45 @@ bool Chassis::UpdatePitch(void)
     estimatedPitchAng = kappa * predictGyro + (1 - kappa) * obsPitch;
     Bias = Bias + E*(predictGyro - obsPitch);  
 
-    //Serial.print(millis());
-   // Serial.print('\t');
-    // Serial.print(obsPitch);
+    // Serial.print(estimatedPitchAng);
     // Serial.print('\t');
-    // Serial.print(predictGyro);
+    // Serial.print(Bias);
     // Serial.print('\t');
-    Serial.print(estimatedPitchAng);
-    Serial.print('\t');
-    Serial.print(Bias);
-    Serial.print('\t');
-     Serial.print(imu.a.x);
-    Serial.print('\t');
-    Serial.print(accXoffset);
-    Serial.print('\t');
-     Serial.print(imu.a.z);
-    Serial.print('\t');
-    Serial.print(accZoffset);
-    Serial.print('\n');
-    return true;
-
-
-    
-    // // Accelerometer
-    //   Serial.print(imu.a.x);
-    //   Serial.print(' ');
-    //   Serial.print(imu.a.y);
-    //   Serial.print(' ');
-    //   Serial.print(imu.a.z);
-    //   Serial.print(' ');
-    
-
-    
-    // // Gyros
-    //   Serial.print(imu.g.x);
-    //   Serial.print(' ');
-    //   Serial.print(imu.g.y);
-    //   Serial.print(' ');
-    //   Serial.print(imu.g.z);
-    //   Serial.print(' ');
-    
-
-    
+    //  Serial.print(imu.a.x);
+    // Serial.print('\t');
+    // Serial.print(accXoffset);
+    // Serial.print('\t');
+    return true;    
   }
     else
-{
-    return false;
-}
+        return false;
 
 }
 
+void Chassis::GetXAverage(void) {
+    if(sampleSize < 200)
+    {
+        isCalibrating = true;
+        if(imu.getStatus() & 0x01)
+        {
+            imu.read();
+            accXoffset += imu.a.x;
+            sampleSize++;
+        }
+    }
+    else if(sampleSize == 200) {
+        accXoffset /= 200.0;
+        isCalibrating = false;
+    }
+}
 
+bool Chassis::IsCalibrating(void) {
+    return isCalibrating;
+}
 
+float Chassis::getPitchAng() { 
+    return(estimatedPitchAng);
+}
 
 /*
  * ISR for timing. On overflow, it takes a 'snapshot' of the encoder counts and raises a flag to let
