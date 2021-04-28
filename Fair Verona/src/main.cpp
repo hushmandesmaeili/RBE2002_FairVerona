@@ -22,14 +22,14 @@ typedef enum {
   TYBALT,
   JULIET
 } Robot;
-Robot robot = ROMI; //set which robot you want it to be
+Robot robot = JULIET; //set which robot you want it to be
 
 typedef enum {
   FIGHT,
   BALCONY,
   FINALSCENE
 }  Scene;
-Scene scene = FIGHT; //set which scene it is
+Scene scene = BALCONY; //set which scene it is
 
 //based on selected robot and scene the correct setup and loop will be run
 
