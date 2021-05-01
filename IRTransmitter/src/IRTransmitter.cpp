@@ -3,13 +3,12 @@
 #include <Romi32U4.h>
 
 Romi32U4Motors motors;  
-const int transmitter= 4;
+const int transmitter = 11;
 
 void setup(){
-pinMode(transmitter, INPUT);    
-OCR1C = 0;
-
-
+    pinMode(transmitter, OUTPUT);    
+    OCR1C = 0;
+    motors.init();
 }
 unsigned long start = millis();
 bool status = 1;
@@ -25,7 +24,7 @@ void loop(){
         OCR1C = 0;
     }
     else{
-         OCR1C = 210;
+         OCR1C = 20;
     }
     start = millis();
  } 

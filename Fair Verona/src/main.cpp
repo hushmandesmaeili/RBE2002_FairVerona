@@ -34,6 +34,7 @@ Scene scene = BALCONY; //set which scene it is
 //based on selected robot and scene the correct setup and loop will be run
 
 void setup() {
+  // julietBalcony.c.setup();
   switch(robot){
     case ROMI:
       switch(scene){

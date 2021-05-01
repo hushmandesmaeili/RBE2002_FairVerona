@@ -214,6 +214,14 @@ float Chassis::rollingAverage(float arr[5]){
   return avg;
 }
 
+// int16_t Chassis::getCountsLeft(void){
+//     return(countsLeft);
+// }
+
+// int16_t Chassis::getCountsRight(void){
+//     return(countsRight);
+}
+
 ISR(TIMER4_OVF_vect)
 {
   //Capture a "snapshot" of the encoder counts for later processing

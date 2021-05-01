@@ -17,9 +17,11 @@ class Chassis{
         void setMotorSpeeds(int left, int right); //speeds -75 to 75
         bool checkIfOnRamp(); //getter that returns true when robot is on ramp
         bool IsCalibrating(void);
+        void GetXAverage(void);
+        // int16_t getCountsLeft(void);
+        // int16_t getCountsRight(void);
     private:
         bool UpdatePitch(void);
-        void GetXAverage(void);
         float getPitchAng(void);
         void wallFollower(void);
         void updateSpeeds(void);
