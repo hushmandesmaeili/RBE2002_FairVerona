@@ -7,8 +7,11 @@ const float actualWidth = 6.1; //actual width in cm
 const float calDistance = 20.0; //calibration distance in cm
 const float calWidth = 45; //in pseudo-pixels
 
+const float centerCX = 80;
+
 //Function prototypes
 float getDistanceCam(uint16_t tagW);
+float getDeltaCXCam(uint16_t tagCX);
 
 void setup()
 {
@@ -42,8 +45,10 @@ uint8_t FindAprilTags()
         Serial.print(tag.id);
         Serial.print(F(", rot="));
         Serial.print(tag.rot);
-        Serial.println(F(", Dist="));
+        Serial.print(F(", Dist="));
         Serial.print(getDistanceCam(tag.w));
+        Serial.print(F(", DetlaCX="));
+        Serial.print(getDeltaCXCam(tag.cx));
         Serial.println(F("]"));
       }
     }
@@ -62,4 +67,11 @@ float getDistanceCam(uint16_t tagW) {
   float distance = (actualWidth / 2) / (tan(tagW * (atan2((actualWidth / 2), calDistance) / calWidth)));
 
   return distance;
+}
+
+float getDeltaCXCam(uint16_t tagCX) {
+
+  float deltaCX = centerCX - tagCX;
+
+  return deltaCX;
 }
