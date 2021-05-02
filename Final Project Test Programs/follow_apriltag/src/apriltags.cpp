@@ -44,3 +44,17 @@ bool readTag(AprilTagDatum* pTag)
 
     return retVal;
 }
+
+float getDistanceCam(uint16_t tagW) {
+
+  float distance = (actualWidth / 2) / (tan(tagW * (atan2((actualWidth / 2), calDistance) / calWidth)));
+
+  return distance;
+}
+
+float getDeltaCXCam(uint16_t tagCX) {
+
+  float deltaCX = centerCX - tagCX;
+
+  return deltaCX;
+}
