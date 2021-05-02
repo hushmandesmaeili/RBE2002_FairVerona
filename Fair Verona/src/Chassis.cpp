@@ -86,10 +86,18 @@ void Chassis::wallFollower(void){
         lastSharpSamples[sampleCount % 5] = getDistance();
         float avg_distance = rollingAverage(lastSharpSamples);
         float error = avg_distance - targetDistance;
-
+       
         turnEffort = wallFollow.ComputeEffort(error);
-        targetSpeedLeft =  targetSpeed - turnEffort;
-        targetSpeedRight = targetSpeed + turnEffort;
+        if(wallFollowDirection){
+        targetSpeedLeft =  targetSpeed + turnEffort;
+        targetSpeedRight = targetSpeed - turnEffort;
+        }
+        else{
+        targetSpeedLeft =  - (targetSpeed + turnEffort);
+        targetSpeedRight = - (targetSpeed - turnEffort);
+        }
+
+       
     }
 }
 
