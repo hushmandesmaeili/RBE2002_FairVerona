@@ -42,7 +42,8 @@ void julietBalcony::loop(){
             //     c.chassis.GetXAverage();
             // }
 
-            if(c.remoteCode == remotePlayPause) state = APPROACH;
+            // if(c.remoteCode == remotePlayPause) state = APPROACH;
+            if(c.buttonB.getSingleDebouncedPress()) state = APPROACH;
         break;
 
         case APPROACH:
@@ -59,7 +60,7 @@ void julietBalcony::loop(){
 
         case ONRAMP:
             if(enteringState){
-                // c.chassis.wallFollowEnable = 1;
+                c.chassis.wallFollowEnable = 1;
                 c.chassis.wallFollowDirection = 1;
                 enteringState = 0;
             }
@@ -141,7 +142,7 @@ void julietBalcony::loop(){
             c.chassis.setMotorSpeeds(10, 10);
             state = WAIT;
             nextState = STOP;
-            waitTime = 2000;
+            waitTime = 3000;
         break;
 
         case STOP:

@@ -11,8 +11,8 @@ class Chassis{
     public:
         void setup();
         void loop();
-        void startWallFollow(); //sets flag that starts wallfollowing
-        void stopWallFollow();
+        // void startWallFollow(); //sets flag that starts wallfollowing
+        // void stopWallFollow();
         //velocity control is always enabled, only works when wall following not enabled
         void setMotorSpeeds(int left, int right); //speeds -75 to 75
         bool checkIfOnRamp(); //getter that returns true when robot is on ramp
