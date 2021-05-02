@@ -52,14 +52,36 @@ void Chassis::setup(){
 }
 
 void Chassis::loop(){
-    wallFollower();
+    if(wallFollowEnable) wallFollower();
     updateSpeeds();
     UpdatePitch();
+    updatePose();
+    if(checkRampEnable) checkRamp();
+
+    if(wallFollowEnable) {
+        manualSpeedsEnable = 0;
+    }
+}
+
+void Chassis::updatePose(void){
+    float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
+    // float dt = timestepMS / 1000; 
+    float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
+    float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
+    float oldTheta = theta;
+    theta = oldTheta + angVel;
+    float thetaStar = (oldTheta + theta) / 2.0;
+    x += speedCenter * cos(thetaStar); //in cm
+    y += speedCenter * sin(thetaStar); //in cm
+
+    // Serial.print(x);
+    // Serial.print("\t");
+    // Serial.println(y);
 }
 
 void Chassis::wallFollower(void){
     //when wall follow timer triggers, set target speeds to feed to velocity controller
-    if(wallFollowTimer.isExpired() && wallFollowEnable){ //for using sharp IR
+    if(wallFollowTimer.isExpired()){ //for using sharp IR
         sampleCount++;
         lastSharpSamples[sampleCount % 5] = getDistance();
         float avg_distance = rollingAverage(lastSharpSamples);
@@ -89,10 +111,10 @@ void Chassis::updateSpeeds(void){
         */
         noInterrupts();
 
-        int16_t speedLeft = countsLeft - prevLeft;
+        speedLeft = countsLeft - prevLeft;
         prevLeft = countsLeft;
 
-        int16_t speedRight = countsRight - prevRight;
+        speedRight = countsRight - prevRight;
         prevRight = countsRight;
 
         interrupts();
@@ -118,15 +140,16 @@ void Chassis::updateSpeeds(void){
       }
 }
 
-
-bool Chassis::UpdatePitch(void)
-{
+void Chassis::checkRamp(){
     if(onRamp){ //update onRamp flag
         if(getPitchAng() < lowerLimit) onRamp = 0;
     } else {
         if(getPitchAng() > upperLimit) onRamp = 1;
     }
+}
 
+bool Chassis::UpdatePitch(void)
+{
  if(imu.getStatus() & 0x01)
   {
     imu.read();
@@ -180,17 +203,19 @@ float Chassis::getPitchAng() {
 }
 
 void Chassis::setMotorSpeeds(int left, int right){ //speeds -75 to 75
-    targetSpeedLeft = left;
-    targetSpeedRight = right;
+    if(manualSpeedsEnable) {
+        targetSpeedLeft = left;
+        targetSpeedRight = right;
+    }
 }
 
-void Chassis::startWallFollow(){
-    wallFollowEnable = 1;
-}
+// void Chassis::startWallFollow(){
+//     wallFollowEnable = 1;
+// }
 
-void Chassis::stopWallFollow(){
-    wallFollowEnable = 0;
-}
+// void Chassis::stopWallFollow(){
+//     wallFollowEnable = 0;
+// }
 
 float Chassis::getDistance(){
   uint16_t adc_out = analogRead(sharpRead);
@@ -220,7 +245,7 @@ float Chassis::rollingAverage(float arr[5]){
 
 // int16_t Chassis::getCountsRight(void){
 //     return(countsRight);
-}
+// }
 
 ISR(TIMER4_OVF_vect)
 {

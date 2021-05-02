@@ -20,13 +20,36 @@ class Chassis{
         void GetXAverage(void);
         // int16_t getCountsLeft(void);
         // int16_t getCountsRight(void);
+
+        //current Pose
+        float x = 0;
+        float y = 0;
+        float theta = 0; //in radians
+
+        //enables
+        bool wallFollowDirection = 1; //1 for forwards line follow
+        bool checkRampEnable = 0;
+        bool wallFollowEnable = 0;
     private:
+        bool manualSpeedsEnable = 1;
+
         bool UpdatePitch(void);
         float getPitchAng(void);
         void wallFollower(void);
         void updateSpeeds(void);
         float getDistance();
         float rollingAverage(float arr[5]);
+        void updatePose(void);
+        void checkRamp(void);
+
+        //parameters -- these will need to be updated after you do your experiments
+        float wheel_track = 15.2; //cm
+        float wheel_diam = 7.085; //cm
+        float ticks_per_rotation = 1440; // from the datasheet
+
+        //actual speed
+        int16_t speedLeft = 0;
+        int16_t speedRight = 0;
 
         ///////////////////////////////
         /////////// variables /////////
@@ -45,7 +68,6 @@ class Chassis{
         uint16_t targetDistance = 25;
         int16_t turnEffort = 0;
         int16_t targetSpeed = 15;
-        bool wallFollowEnable = 0;
 
         //imu and ramp constants
         LSM6 imu;

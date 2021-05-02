@@ -10,7 +10,7 @@
 class commonCode{
     public:
         Chassis chassis;
-        Romi32U4ButtonA buttonA;
+        // Romi32U4ButtonA buttonA;
         Romi32U4ButtonB buttonB;
         Romi32U4ButtonC buttonC;
 

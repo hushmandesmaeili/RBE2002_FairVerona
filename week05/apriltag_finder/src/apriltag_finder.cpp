@@ -46,4 +46,5 @@ void loop()
 { 
   delay(1); //calm things down for a millisec...not needed in a program that does other things
   FindAprilTags();
+  // Serial.println("ya yeet my boi");
 }

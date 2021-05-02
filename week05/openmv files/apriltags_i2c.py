@@ -105,3 +105,4 @@ while(True):
 
     num_tags = min(len(tags), max_blocks)
     print("%d tags(s) found - FPS %f" % (num_tags, clock.fps()))
+    #print("%d tags(s) found - FPS %f" % (len(tags), clock.fps()))
