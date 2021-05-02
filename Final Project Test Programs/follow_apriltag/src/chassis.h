@@ -21,6 +21,9 @@ private:
     float kp_distance = 2.7;
     float kp_alignment = 0.1;
 
+    //constant for camera offset from front of chassis
+    const float CAMERA_OFFSET = 12.0;
+
     //current Pose
     float x = 50;
     float y = 0;
@@ -67,6 +70,7 @@ public:
     void MoveToPoint(void);
     bool AreWeThere(void);
     void FollowAprilTag(float targetDistance);
+    int DetectAprilTag();
 };
 
 #endif

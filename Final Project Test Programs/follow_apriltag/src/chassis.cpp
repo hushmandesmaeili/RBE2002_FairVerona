@@ -112,28 +112,58 @@ bool Chassis::AreWeThere(void)
 
 
 void Chassis::FollowAprilTag(float targetDistance) {
+
+    float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
     
     uint8_t tagCount = getTagCount();
     if(tagCount) 
     {
+        // tagCount = getTagCount();
+        // Serial.print(tagCount);
+        // Serial.print("\n");
+        // if (tagCount == 0) {
+        //     targetSpeedLeft = 0;
+        //     targetSpeedRight = 0;
+        // }
         if(readTag(&tag)) {
 
-            float errorDistance =  getDistanceCam(tag.w) - targetDistance;
+            float errorDistance =  getDistanceCam(tag.w) - tDistance;
             float errorXTranslation = getDeltaCXCam(tag.cx);
 
             targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
             targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
 
-            Serial.print(getDistanceCam(tag.w));
-            Serial.print("\t");
-            Serial.print(errorDistance);
-            Serial.print("\t");
-            Serial.print(targetSpeedLeft);
-            Serial.print("\t");
-            Serial.print(targetSpeedRight);
-            Serial.print("\n");
+            // Serial.print(getDistanceCam(tag.w));
+            // Serial.print("\t");
+            // Serial.print(errorDistance);
+            // Serial.print("\t");
+            // Serial.print(targetSpeedLeft);
+            // Serial.print("\t");
+            // Serial.print(targetSpeedRight);
+            // Serial.print("\n");
         }
     }
+}
+
+int Chassis::DetectAprilTag() {
+
+    int retID;
+
+    uint8_t tagCount = getTagCount();
+    if(tagCount) 
+    {
+        if(readTag(&tag)) {
+            retID = tag.id;
+        }
+        else
+            retID = -1;
+
+        // Serial.print(retID);
+        // Serial.print("\n");
+    }
+
+    return retID;
+
 }
 
 /*
