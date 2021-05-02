@@ -27,7 +27,7 @@ class Chassis{
         float theta = 0; //in radians
 
         //enables
-        bool wallFollowDirection = 1; //1 for forwards line follow
+        bool wallFollowDirection = 1; //1 for forwards wall follow
         bool checkRampEnable = 0;
         bool wallFollowEnable = 0;
     private:
