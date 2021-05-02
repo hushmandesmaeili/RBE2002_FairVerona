@@ -3,6 +3,7 @@
 
 #include <Romi32U4.h>
 #include "PIDcontroller.h"
+#include <apriltags.h>
 
 class Chassis
 {
@@ -12,9 +13,13 @@ private:
     float wheel_diam = 7.085; //cm
     float ticks_per_rotation = 1440; // from the datasheet
 
-    // constants to control speed of the wheels for inverse kinematics
+    //constants to control speed of the wheels for inverse kinematics
     float kpD = 0.75;
     float kpTheta = 12;
+
+    //constants to control of speed of the wheels based on camera
+    float kp_distance = 2.7;
+    float kp_alignment = 0.1;
 
     //current Pose
     float x = 50;
@@ -23,6 +28,7 @@ private:
 
     //
     const int BUFFER = 4;
+    const int BUFFER_FOLLOWER = 2;
 
     //current target
     float x_target = 0;
@@ -48,6 +54,9 @@ private:
     //be sure to set this -- it needs to match your "readyToPID" period
     uint32_t timestepMS = 16; // in ms
 
+    //AprilTag data structure
+    AprilTagDatum tag;
+
 public:
     Chassis(void);
     void Init(void);
@@ -57,6 +66,7 @@ public:
     void UpdateSpeeds(void);
     void MoveToPoint(void);
     bool AreWeThere(void);
+    void FollowAprilTag(float targetDistance);
 };
 
 #endif

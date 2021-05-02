@@ -37,6 +37,8 @@ void Chassis::Init(void)
     interrupts(); //re-enable interrupts
 
     //pinMode(6, OUTPUT); //COMMENT THIS OUT TO SHUT UP THE PIEZO!!!
+    Wire.begin();
+    Wire.setClock(100000ul); // Wire should default to 100kHz, but let's be explicit
 }
 
 void Chassis::UpdateSpeeds(void)
@@ -102,9 +104,36 @@ void Chassis::MoveToPoint(void) {
     targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
     targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
 }
+
 bool Chassis::AreWeThere(void)
 {
     return (abs(x - x_target) <= BUFFER && abs(y - y_target) <= BUFFER);
+}
+
+
+void Chassis::FollowAprilTag(float targetDistance) {
+    
+    uint8_t tagCount = getTagCount();
+    if(tagCount) 
+    {
+        if(readTag(&tag)) {
+
+            float errorDistance =  getDistanceCam(tag.w) - targetDistance;
+            float errorXTranslation = getDeltaCXCam(tag.cx);
+
+            targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
+            targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
+
+            Serial.print(getDistanceCam(tag.w));
+            Serial.print("\t");
+            Serial.print(errorDistance);
+            Serial.print("\t");
+            Serial.print(targetSpeedLeft);
+            Serial.print("\t");
+            Serial.print(targetSpeedRight);
+            Serial.print("\n");
+        }
+    }
 }
 
 /*

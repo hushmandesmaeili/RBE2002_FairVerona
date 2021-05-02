@@ -79,9 +79,9 @@ void HandleTimerExpired(void)
         }
       break;
       case DR_TARGET:
-        float x = radius * cos(angleInt * count);
-        float y = radius * sin(angleInt * count);
-        chassis.SetTargetPosition(x, y);
+        float xt = radius * cos(angleInt * count);
+        float yt = radius * sin(angleInt * count);
+        chassis.SetTargetPosition(xt, yt);
       case DR_DRIVING:
         chassis.MoveToPoint();
         if(chassis.AreWeThere()) {
