@@ -58,6 +58,11 @@ void loop()
 }
 
 float getDistanceCam(uint16_t tagW) {
+  // float distance = tagW * (calDistance / calWidth);
+
+// float angle = 1.25 * tagW/45
+
+  // float distance = tagW * atan2(angle);
 
   float distance = (actualWidth / 2) / (tan(tagW * (atan2((actualWidth / 2), calDistance) / calWidth)));
 

@@ -83,15 +83,21 @@ void Chassis::UpdatePose() {
     x += speedCenter * cos(thetaStar); //in cm
     y += speedCenter * sin(thetaStar); //in cm
 
-    Serial.print(x);
-    Serial.print("\t");
-    Serial.println(y);
+    // Serial.print(x);
+    // Serial.print("\t");
+    // Serial.print(y);
+    // Serial.print("\n");
 }
 
 void Chassis::MoveToPoint(void) {
     float errorDistance = sqrt(pow((x - x_target), 2) + pow((y - y_target), 2));
     float internalTargetTheta = atan2(y_target - y, x_target - x);
     float errorTheta =  internalTargetTheta - theta;
+
+    // Serial.print(errorDistance);
+    // Serial.print("\t");
+    // Serial.print(errorTheta);
+    // Serial.print("\n");
 
     targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
     targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;

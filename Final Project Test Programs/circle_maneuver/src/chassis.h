@@ -22,7 +22,7 @@ private:
     float theta = PI / 2;
 
     //
-    const int BUFFER = 2;
+    const int BUFFER = 4;
 
     //current target
     float x_target = 0;
