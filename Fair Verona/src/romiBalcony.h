@@ -26,4 +26,7 @@ class romiBalcony{
 
     bool enteringState = 1;
     unsigned long timeLast, waitTime, printTime;
+    float thetaLast = 0;
+    int count;
+    float turnAngle;
 };

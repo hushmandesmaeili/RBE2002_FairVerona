@@ -293,9 +293,9 @@ int Chassis::DetectAprilTag() {
         if(readTag(&tag)) {
             retID = tag.id;
         }
-        else
-            retID = -1;
-    }
+    } 
+    else
+        retID = -1;
 
     return retID;
 }
