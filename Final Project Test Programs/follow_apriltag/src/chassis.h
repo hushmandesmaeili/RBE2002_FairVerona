@@ -14,12 +14,15 @@ private:
     float ticks_per_rotation = 1440; // from the datasheet
 
     //constants to control speed of the wheels for inverse kinematics
-    float kpD = 0.75;
-    float kpTheta = 12;
+    const float kpD = 0.75;
+    const float kpTheta = 12;
 
     //constants to control of speed of the wheels based on camera
-    float kp_distance = 2.7;
-    float kp_alignment = 0.1;
+    const float kp_distance = 2.7;
+    const float kp_alignment = 0.1;
+
+    //constant for camera offset from front of chassis
+    const float CAMERA_OFFSET = 12.0;
 
     //current Pose
     float x = 50;
@@ -27,8 +30,8 @@ private:
     float theta = PI / 2;
 
     //
-    const int BUFFER = 4;
-    const int BUFFER_FOLLOWER = 2;
+    const int BUFFER_TARGET_POSE = 4;
+    const int BUFFER_CAMERA_FOLLOWER = 2;
 
     //current target
     float x_target = 0;
@@ -67,6 +70,7 @@ public:
     void MoveToPoint(void);
     bool AreWeThere(void);
     void FollowAprilTag(float targetDistance);
+    int DetectAprilTag();
 };
 
 #endif

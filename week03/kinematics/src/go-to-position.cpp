@@ -52,7 +52,7 @@ void HandleTimerExpired(void)
           {
             // chassis.SetTargetSpeeds(12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
             // waitTimer.reset(5000);          //YOU'LL WANT TO CHANGE THESE
-            chassis.SetTargetPosition(30.0, 30.0);
+            chassis.SetTargetPosition(90.0, 0.0);
 
             state = DR_DRIVING;
           }
@@ -61,7 +61,7 @@ void HandleTimerExpired(void)
           //   chassis.SetTargetSpeeds(-12.2, 12.2);  //YOU'LL WANT TO CHANGE THESE
           //   waitTimer.reset(4000);          //YOU'LL WANT TO CHANGE THESE
 
-            chassis.SetTargetPosition(60.0, 0.0);
+            chassis.SetTargetPosition(120.0, 20.0);
             state = DR_DRIVING;
           }
           else if(destination == DEST_C) //curl

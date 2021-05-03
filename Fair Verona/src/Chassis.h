@@ -6,6 +6,7 @@
 #include "ourTimer.h"
 #include "Romi32U4Encoders.h"
 #include "LSM6.h"
+#include "apriltags.h"
 
 class Chassis{
     public:
@@ -15,6 +16,11 @@ class Chassis{
         // void stopWallFollow();
         //velocity control is always enabled, only works when wall following not enabled
         void setMotorSpeeds(int left, int right); //speeds -75 to 75
+        void SetTargetPosition(float xt, float yt) { x_target = xt; y_target = yt; }
+        void MoveToPoint(void);
+        bool AtTargetPosition(void);
+        void FollowAprilTag(float targetDistance);
+        int DetectAprilTag();
         bool checkIfOnRamp(); //getter that returns true when robot is on ramp
         bool IsCalibrating(void);
         void GetXAverage(void);
@@ -59,6 +65,31 @@ class Chassis{
         float targetSpeedLeft = 0;
         float targetSpeedRight = 0;
 
+        //current Pose
+
+        //current target
+        float x_target = 0;
+        float y_target = 0;
+        float th_target = 0; //may or may not be specified
+
+        //constants for buffers
+        const int BUFFER_TARGET_POSE = 4;
+        const int BUFFER_CAMERA_FOLLOWER = 0.5;
+
+        //constants to control speed of the wheels for inverse kinematics
+        const float kpD = 0.75;
+        const float kpTheta = 12;
+
+        //constants to control of speed of the wheels based on camera
+        const float kp_distance = 2.7;
+        const float kp_alignment = 0.1;
+
+        //constant for camera offset from front of chassis
+        const float CAMERA_OFFSET = 12.0;
+
+        //AprilTag data structure
+        AprilTagDatum tag;
+
         const uint8_t sharpRead = 18; //pin for Sharp IR
         const uint8_t sharpRead2 = 22;
         const float VREF = 5.0;
@@ -70,7 +101,7 @@ class Chassis{
         uint16_t targetDistance = 12; //in cm
         int16_t turnEffort = 0;
         int16_t targetSpeed = 15;
-
+        
         //imu and ramp constants
         LSM6 imu;
 
