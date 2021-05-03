@@ -12,17 +12,18 @@ class romiBalcony{
         IDLE,
         DRIVETOSTART,
         LOOKINGFORTAG,
-        EXCITE,
+        R2D2,
         TURNTODRIVE,
         DRIVETOBOTTOM,
         TURNTOJULIET,
         FOLLOWJULIET,
         STOP,
-        WAIT
+        WAIT,
+        TEST
     } State;
-    State state = IDLE;
+    State state;
     State nextState;
 
     bool enteringState = 1;
-    unsigned long timeLast, waitTime;
+    unsigned long timeLast, waitTime, printTime;
 };

@@ -3,12 +3,19 @@
 void julietBalcony::setup(){
     c.setup();
     c.chassis.checkRampEnable = 1;
+
+    state = IDLE;
 }
 
+
 void julietBalcony::loop(){
-    if(millis() - timeLast < 5000){
+    if(millis() - printTime > 500){
+        Serial.print(millis());
+        Serial.print('\t');
+        Serial.print(timeLast);
+        Serial.print('\t');
         Serial.println(state);
-        timeLast = millis();
+        printTime = millis();
         // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
     }
 
@@ -17,16 +24,16 @@ void julietBalcony::loop(){
     switch(state){
         case TEST:
             if(enteringState){
-                c.chassis.wallFollowDirection = 0;
+                c.chassis.wallFollowDirection = 1;
                 c.chassis.wallFollowEnable = 1;
                 enteringState = 0;
             }
         break;
         case IDLE:
-            //while idling will calibrate when button a is pressed (blocking)
-            // if(c.buttonC.getSingleDebouncedPress() || c.chassis.IsCalibrating()) {
-            //     c.chassis.GetXAverage();
-            // }
+            // while idling will calibrate when button a is pressed (blocking)
+            if(c.buttonC.getSingleDebouncedPress() || c.chassis.IsCalibrating()) {
+                c.chassis.GetXAverage();
+            }
 
             // if(c.remoteCode == remotePlayPause) state = APPROACH;
             if(c.buttonB.getSingleDebouncedPress()) state = APPROACH;
@@ -49,12 +56,13 @@ void julietBalcony::loop(){
             if(enteringState){
                 enteringState = 0;
             }
+
             if(!c.chassis.checkIfOnRamp()){
+                c.chassis.wallFollowEnable = 0;
+                c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = TOPOFRAMP;
                 waitTime = 1000;
-                c.chassis.wallFollowEnable = 0;
-                c.chassis.setMotorSpeeds(0, 0);
                 enteringState = 1;
             }
         break;
@@ -66,7 +74,7 @@ void julietBalcony::loop(){
                 c.chassis.setMotorSpeeds(-3, 3);
             }
 
-            if(c.chassis.theta - thetaLast > 20){
+            if(c.chassis.theta - thetaLast > 25){
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = SPINBACK;
@@ -82,7 +90,7 @@ void julietBalcony::loop(){
                 c.chassis.setMotorSpeeds(3, -3);
             }
 
-            if(c.chassis.theta - thetaLast < -20){
+            if(c.chassis.theta - thetaLast < -25){
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = DOWNRAMP;
@@ -94,8 +102,9 @@ void julietBalcony::loop(){
         case DOWNRAMP:
             if(enteringState){
                 enteringState = 0;
-                c.chassis.wallFollowEnable = 1;
-                c.chassis.wallFollowDirection = 0;
+                // c.chassis.wallFollowEnable = 1;
+                // c.chassis.wallFollowDirection = 0;
+                c.chassis.setMotorSpeeds(-10, -10);
                 goingDown = 0;
             }
 
@@ -109,11 +118,24 @@ void julietBalcony::loop(){
         case ONFLOOR:
             if(enteringState){
                 enteringState = 0;
-                thetaLast = c.chassis.theta;
-                c.chassis.setMotorSpeeds(-3, 3);
+                timeLast = millis();
+                c.chassis.setMotorSpeeds(-10, -10);
             }
 
-            if(c.chassis.theta - thetaLast > 20){
+            if(millis() - timeLast > 3000){
+                enteringState = 1;
+                state = TURNAWAY;
+            }
+        break;
+
+        case TURNAWAY:
+            if(enteringState){
+                enteringState = 0;
+                thetaLast = c.chassis.theta;
+                c.chassis.setMotorSpeeds(3, -3);
+            }
+
+            if(c.chassis.theta - thetaLast < -25){
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = DRIVEOFF;

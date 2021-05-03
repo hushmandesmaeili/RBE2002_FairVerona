@@ -91,14 +91,14 @@ class Chassis{
         AprilTagDatum tag;
 
         const uint8_t sharpRead = 18; //pin for Sharp IR
-        const uint8_t sharpRead2 = 22;
+        // const uint8_t sharpRead2 = 22;
         const float VREF = 5.0;
         float lastSharpSamples[5];
         uint16_t sampleCount = 0;
-        uint16_t adc_out;
+        // uint16_t adc_out;
 
         //constants for wall follow
-        uint16_t targetDistance = 12; //in cm
+        uint16_t targetDistance = 14; //in cm
         int16_t turnEffort = 0;
         int16_t targetSpeed = 15;
         
@@ -106,8 +106,8 @@ class Chassis{
         LSM6 imu;
 
         bool onRamp = 0; //true if on ramp
-        float upperLimit = 0.1;
-        float lowerLimit = 0.05;
+        float upperLimit = 0.15;
+        float lowerLimit = 0.1; //limit when on ramp
 
         //be sure to set this -- it needs to match your "readyToPID" period
         uint32_t timestepMS = 16; // in ms

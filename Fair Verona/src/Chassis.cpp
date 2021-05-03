@@ -4,7 +4,7 @@ PIDController leftMotorController(12, 1, 0, 300); //start with  Kp = 1
 PIDController rightMotorController(12, 1, 0, 300); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows
 
-PIDController wallFollow(3, 0.1, 0, 75); //wall follow controller
+PIDController wallFollow(3, 0.1, 0.1, 15); //wall follow controller
 ourTimer wallFollowTimer(50); //every 50ms
 
 volatile int16_t countsLeft = 0;
@@ -28,7 +28,7 @@ void Chassis::setup(){
     interrupts(); //re-enable interrupts
 
     pinMode(sharpRead, INPUT); //read sharp IR
-    pinMode(sharpRead2, INPUT);
+    // pinMode(sharpRead2, INPUT);
 
     Wire.begin();
 
@@ -59,49 +59,13 @@ void Chassis::loop(){
     updatePose();
     if(checkRampEnable) checkRamp();
 
-    if(wallFollowEnable) {
-        manualSpeedsEnable = 0;
-    }
+    // if(wallFollowEnable) {
+    //     manualSpeedsEnable = 0;
+    // } else {
+    //     manualSpeedsEnable = 1;
+    // }
 }
 
-<<<<<<< HEAD
-void Chassis::updatePose(void){
-    float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
-    // float dt = timestepMS / 1000; 
-    float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
-    float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
-    float oldTheta = theta;
-    theta = oldTheta + angVel;
-    float thetaStar = (oldTheta + theta) / 2.0;
-    x += speedCenter * cos(thetaStar); //in cm
-    y += speedCenter * sin(thetaStar); //in cm
-
-    // Serial.print(x);
-    // Serial.print("\t");
-    // Serial.println(y);
-}
-
-void Chassis::wallFollower(void){
-    //when wall follow timer triggers, set target speeds to feed to velocity controller
-    if(wallFollowTimer.isExpired()){ //for using sharp IR
-        sampleCount++;
-        lastSharpSamples[sampleCount % 5] = getDistance();
-        float avg_distance = rollingAverage(lastSharpSamples);
-        float error = avg_distance - targetDistance;
-       
-        turnEffort = wallFollow.ComputeEffort(error);
-        if(wallFollowDirection){
-            targetSpeedLeft =  targetSpeed + turnEffort;
-            targetSpeedRight = targetSpeed - turnEffort;
-        } else {
-            targetSpeedLeft =  - (targetSpeed - turnEffort);
-            targetSpeedRight = - (targetSpeed + turnEffort);
-        } 
-    }
-}
-
-=======
->>>>>>> 4bfa3d325415890e48ac4910f195863c63aab4dd
 void Chassis::updateSpeeds(void){
     //uses target speed values to make robot go at speed
     //currently always using velocity control
@@ -195,12 +159,12 @@ void Chassis::wallFollower(void){
        
         turnEffort = wallFollow.ComputeEffort(error);
         if(wallFollowDirection){
-        targetSpeedLeft =  targetSpeed + turnEffort;
-        targetSpeedRight = targetSpeed - turnEffort;
+            targetSpeedLeft =  targetSpeed + turnEffort;
+            targetSpeedRight = targetSpeed - turnEffort;
         }
-        else{
-        targetSpeedLeft =  - (targetSpeed + turnEffort);
-        targetSpeedRight = - (targetSpeed - turnEffort);
+        else {
+            targetSpeedLeft =  - (targetSpeed + turnEffort);
+            targetSpeedRight = - (targetSpeed - turnEffort);
         }
 
        
@@ -223,7 +187,8 @@ bool Chassis::UpdatePitch(void)
     float obsPitch = atan2((double)(imu.a.x - accXoffset),(double)(imu.a.z));
     estimatedPitchAng = kappa * predictGyro + (1 - kappa) * obsPitch;
     Bias = Bias + E*(predictGyro - obsPitch);  
-
+    
+    // Serial.print("est pitch: ");
     // Serial.print(estimatedPitchAng);
     // Serial.print('\t');
     // Serial.print(Bias);
@@ -269,10 +234,10 @@ float Chassis::getPitchAng() {
 }
 
 void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
-    if (manualSpeedsEnable) {
+    // if (manualSpeedsEnable) {
         targetSpeedLeft = left;
         targetSpeedRight = right;
-    }
+    // }
 }
 
 // void Chassis::startWallFollow(){
@@ -283,11 +248,10 @@ void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
 //     wallFollowEnable = 0;
 // }
 
-<<<<<<< HEAD
 float Chassis::getDistance(){
-  if(wallFollowDirection) adc_out = analogRead(sharpRead);
-  else adc_out = analogRead(sharpRead2);
-=======
+  uint16_t adc_out = analogRead(sharpRead);
+//   if(wallFollowDirection) adc_out = analogRead(sharpRead);
+//   else adc_out = analogRead(sharpRead2);
   float voltage_out = ((float) adc_out * VREF) / 1023;
 
   float distance = 15.1 / (voltage_out - 0.333);
