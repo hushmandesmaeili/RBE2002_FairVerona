@@ -1,7 +1,7 @@
 #include "LEDManager.h"
 
 void LEDManager::setup(){
-    pinMode(LEDPin, OUTPUT);    
+    // pinMode(LEDPin, OUTPUT);    
 }
 
 void LEDManager::fadeIn(void){

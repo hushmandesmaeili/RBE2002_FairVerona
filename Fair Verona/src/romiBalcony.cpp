@@ -2,16 +2,17 @@
 
 void romiBalcony::setup(){
     c.setup();
+    c.ledmanager.fadeInBool = 1;
 
     state = IDLE;
 }
 
 void romiBalcony::loop(){
-    if(millis() - printTime > 500){
-        Serial.print(state);
-        printTime = millis();
-        // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
-    }
+    // if(millis() - printTime > 2000){
+    //     Serial.print(state);
+    //     printTime = millis();
+    //     // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
+    // }
 
     // c.chassis.FollowAprilTag(20);
 
@@ -97,8 +98,37 @@ void romiBalcony::loop(){
         case DRIVETOBOTTOM:
             c.chassis.setMotorSpeeds(15, 15);
             state = WAIT;
-            nextState = STOP;
+            nextState = TURNTOJULIET;
             waitTime = 2000;
+        break;
+
+        case TURNTOJULIET:
+            if(enteringState){
+                enteringState = 0;
+                thetaLast = c.chassis.theta;
+
+                c.chassis.setMotorSpeeds(-15, 15);
+            }
+
+            if(c.chassis.theta - thetaLast > 25){
+                state = FOLLOWJULIET;
+                c.chassis.setMotorSpeeds(0, 0);
+                enteringState = 1;
+            }
+        break;
+
+        case FOLLOWJULIET:
+            if(enteringState){
+                timeLast = millis();
+                enteringState = 0;
+            }
+
+            c.chassis.FollowAprilTag(20);
+
+            if(millis() - timeLast > 10000){
+                state = STOP;
+                enteringState = 1;
+            }
         break;
 
         case WAIT:
