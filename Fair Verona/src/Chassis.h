@@ -60,12 +60,14 @@ class Chassis{
         float targetSpeedRight = 0;
 
         const uint8_t sharpRead = 18; //pin for Sharp IR
+        const uint8_t sharpRead2 = 22;
         const float VREF = 5.0;
         float lastSharpSamples[5];
         uint16_t sampleCount = 0;
+        uint16_t adc_out;
 
         //constants for wall follow
-        uint16_t targetDistance = 25;
+        uint16_t targetDistance = 12; //in cm
         int16_t turnEffort = 0;
         int16_t targetSpeed = 15;
 

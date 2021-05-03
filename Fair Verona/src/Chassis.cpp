@@ -4,7 +4,7 @@ PIDController leftMotorController(12, 1, 0, 300); //start with  Kp = 1
 PIDController rightMotorController(12, 1, 0, 300); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows
 
-PIDController wallFollow(1, 0.1, 1, 75); //wall follow controller
+PIDController wallFollow(3, 0.1, 0, 75); //wall follow controller
 ourTimer wallFollowTimer(50); //every 50ms
 
 volatile int16_t countsLeft = 0;
@@ -28,6 +28,7 @@ void Chassis::setup(){
     interrupts(); //re-enable interrupts
 
     pinMode(sharpRead, INPUT); //read sharp IR
+    pinMode(sharpRead2, INPUT);
 
     Wire.begin();
 
@@ -89,15 +90,12 @@ void Chassis::wallFollower(void){
        
         turnEffort = wallFollow.ComputeEffort(error);
         if(wallFollowDirection){
-        targetSpeedLeft =  targetSpeed + turnEffort;
-        targetSpeedRight = targetSpeed - turnEffort;
-        }
-        else{
-        targetSpeedLeft =  - (targetSpeed + turnEffort);
-        targetSpeedRight = - (targetSpeed - turnEffort);
-        }
-
-       
+            targetSpeedLeft =  targetSpeed + turnEffort;
+            targetSpeedRight = targetSpeed - turnEffort;
+        } else {
+            targetSpeedLeft =  - (targetSpeed - turnEffort);
+            targetSpeedRight = - (targetSpeed + turnEffort);
+        } 
     }
 }
 
@@ -226,7 +224,8 @@ void Chassis::setMotorSpeeds(int left, int right){ //speeds -75 to 75
 // }
 
 float Chassis::getDistance(){
-  uint16_t adc_out = analogRead(sharpRead);
+  if(wallFollowDirection) adc_out = analogRead(sharpRead);
+  else adc_out = analogRead(sharpRead2);
   float voltage_out = ((float) adc_out * VREF) / 1023;
 
   float distance = 15.1 / (voltage_out - 0.333);

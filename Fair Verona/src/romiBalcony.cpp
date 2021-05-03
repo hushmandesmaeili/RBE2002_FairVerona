@@ -4,28 +4,11 @@ void romiBalcony::setup(){
     c.setup();
 }
 
-typedef enum{
-    IDLE,
-    DRIVETOSTART,
-    LOOKINGFORTAG,
-    EXCITE,
-    TURNTODRIVE,
-    DRIVETOBOTTOM,
-    TURNTOJULIET,
-    FOLLOWJULIET,
-    STOP,
-    WAIT
-} State;
-State state = IDLE;
-State nextState;
-
-bool enteringState = 1;
-unsigned long timeLast, waitTime;
-
 void romiBalcony::loop(){
     c.loop();
     
     switch(state){
+    
         case IDLE:
             if(enteringState){
                 enteringState = 0;
@@ -44,7 +27,7 @@ void romiBalcony::loop(){
                 timeLast = millis();
                 waitTime = 1000;
             }
-            //need a drive for encoder counts function
+            //need a drive for pose counts function
         break;
 
         case WAIT:
@@ -56,5 +39,6 @@ void romiBalcony::loop(){
                 state = nextState;
                 enteringState  = 0;
             }
+        break;
     }
 }

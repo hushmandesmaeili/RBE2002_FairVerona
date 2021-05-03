@@ -5,37 +5,23 @@ void julietBalcony::setup(){
     c.chassis.checkRampEnable = 1;
 }
 
-typedef enum{
-    IDLE,
-    APPROACH,
-    ONRAMP,
-    TOPOFRAMP,
-    WAIT,
-    SPINBACK,
-    DOWNRAMP,
-    ONFLOOR,
-    DRIVEOFF,
-    STOP
-} State;
-State state = IDLE;
-State nextState;
-
-bool enteringState = 1;
-
-bool goingDown;
-unsigned long timeLast, waitTime;
-float thetaLast = 0;
-int speed;
-
 void julietBalcony::loop(){
-    if(millis() - timeLast < 200){
-        Serial.println(c.chassis.theta);
+    if(millis() - timeLast < 5000){
+        Serial.println(state);
         timeLast = millis();
+        // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
     }
 
     c.loop();
 
     switch(state){
+        case TEST:
+            if(enteringState){
+                c.chassis.wallFollowDirection = 0;
+                c.chassis.wallFollowEnable = 1;
+                enteringState = 0;
+            }
+        break;
         case IDLE:
             //while idling will calibrate when button a is pressed (blocking)
             // if(c.buttonC.getSingleDebouncedPress() || c.chassis.IsCalibrating()) {
@@ -48,7 +34,8 @@ void julietBalcony::loop(){
 
         case APPROACH:
             if(enteringState) {
-                c.chassis.setMotorSpeeds(10, 10);
+                c.chassis.wallFollowEnable = 1;
+                c.chassis.wallFollowDirection = 1;
                 enteringState = 0;
             }
 
@@ -60,8 +47,6 @@ void julietBalcony::loop(){
 
         case ONRAMP:
             if(enteringState){
-                c.chassis.wallFollowEnable = 1;
-                c.chassis.wallFollowDirection = 1;
                 enteringState = 0;
             }
             if(!c.chassis.checkIfOnRamp()){
