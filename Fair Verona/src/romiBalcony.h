@@ -8,6 +8,7 @@ class romiBalcony{
         void loop();
     private:
         commonCode c;
+<<<<<<< Updated upstream
         typedef enum{
         IDLE,
         DRIVETOSTART,
@@ -26,4 +27,6 @@ class romiBalcony{
 
     bool enteringState = 1;
     unsigned long timeLast, waitTime, printTime;
+=======
+>>>>>>> Stashed changes
 };
