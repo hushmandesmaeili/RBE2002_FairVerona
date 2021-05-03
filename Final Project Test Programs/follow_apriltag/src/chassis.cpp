@@ -107,7 +107,7 @@ void Chassis::MoveToPoint(void) {
 
 bool Chassis::AreWeThere(void)
 {
-    return (abs(x - x_target) <= BUFFER && abs(y - y_target) <= BUFFER);
+    return (abs(x - x_target) <= BUFFER_TARGET_POSE && abs(y - y_target) <= BUFFER_TARGET_POSE);
 }
 
 
