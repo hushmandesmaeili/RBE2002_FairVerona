@@ -63,44 +63,6 @@ void Chassis::loop(){
     }
 }
 
-void Chassis::updatePose(void){
-    float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
-    // float dt = timestepMS / 1000; 
-    float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
-    float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
-    float oldTheta = theta;
-    theta = oldTheta + angVel;
-    float thetaStar = (oldTheta + theta) / 2.0;
-    x += speedCenter * cos(thetaStar); //in cm
-    y += speedCenter * sin(thetaStar); //in cm
-
-    // Serial.print(x);
-    // Serial.print("\t");
-    // Serial.println(y);
-}
-
-void Chassis::wallFollower(void){
-    //when wall follow timer triggers, set target speeds to feed to velocity controller
-    if(wallFollowTimer.isExpired()){ //for using sharp IR
-        sampleCount++;
-        lastSharpSamples[sampleCount % 5] = getDistance();
-        float avg_distance = rollingAverage(lastSharpSamples);
-        float error = avg_distance - targetDistance;
-       
-        turnEffort = wallFollow.ComputeEffort(error);
-        if(wallFollowDirection){
-        targetSpeedLeft =  targetSpeed + turnEffort;
-        targetSpeedRight = targetSpeed - turnEffort;
-        }
-        else{
-        targetSpeedLeft =  - (targetSpeed + turnEffort);
-        targetSpeedRight = - (targetSpeed - turnEffort);
-        }
-
-       
-    }
-}
-
 void Chassis::updateSpeeds(void){
     //uses target speed values to make robot go at speed
     //currently always using velocity control
@@ -148,8 +110,66 @@ void Chassis::updateSpeeds(void){
       }
 }
 
+void Chassis::updatePose(void){
+    float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
+    // float dt = timestepMS / 1000; 
+    float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
+    float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
+    float oldTheta = theta;
+    theta = oldTheta + angVel;
+    float thetaStar = (oldTheta + theta) / 2.0;
+    x += speedCenter * cos(thetaStar); //in cm
+    y += speedCenter * sin(thetaStar); //in cm
+
+    // Serial.print(x);
+    // Serial.print("\t");
+    // Serial.println(y);
+}
+
+void Chassis::MoveToPoint(void) {
+    float errorDistance = sqrt(pow((x - x_target), 2) + pow((y - y_target), 2));
+    float internalTargetTheta = atan2(y_target - y, x_target - x);
+    float errorTheta =  internalTargetTheta - theta;
+
+    // Serial.print(errorDistance);
+    // Serial.print("\t");
+    // Serial.print(errorTheta);
+    // Serial.print("\n");
+
+    targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
+    targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
+}
+
+bool Chassis::AtTargetPosition(void) {
+    bool retValue = (abs(x - x_target) <= BUFFER_TARGET_POSE && abs(y - y_target) <= BUFFER_TARGET_POSE);
+
+    return retValue;
+}
+
+void Chassis::wallFollower(void){
+    //when wall follow timer triggers, set target speeds to feed to velocity controller
+    if(wallFollowTimer.isExpired()){ //for using sharp IR
+        sampleCount++;
+        lastSharpSamples[sampleCount % 5] = getDistance();
+        float avg_distance = rollingAverage(lastSharpSamples);
+        float error = avg_distance - targetDistance;
+       
+        turnEffort = wallFollow.ComputeEffort(error);
+        if(wallFollowDirection){
+        targetSpeedLeft =  targetSpeed + turnEffort;
+        targetSpeedRight = targetSpeed - turnEffort;
+        }
+        else{
+        targetSpeedLeft =  - (targetSpeed + turnEffort);
+        targetSpeedRight = - (targetSpeed - turnEffort);
+        }
+
+       
+    }
+}
+
 void Chassis::checkRamp(){
-    if(onRamp){ //update onRamp flag
+    if(onRamp) { //update onRamp flag
         if(getPitchAng() < lowerLimit) onRamp = 0;
     } else {
         if(getPitchAng() > upperLimit) onRamp = 1;
@@ -158,8 +178,7 @@ void Chassis::checkRamp(){
 
 bool Chassis::UpdatePitch(void)
 {
- if(imu.getStatus() & 0x01)
-  {
+ if (imu.getStatus() & 0x01) {
     imu.read();
     float predictGyro = estimatedPitchAng + (dataRateSec * (imu.g.y - Bias) * senseRad);
     float obsPitch = atan2((double)(imu.a.x - accXoffset),(double)(imu.a.z));
@@ -181,7 +200,7 @@ bool Chassis::UpdatePitch(void)
 
 }
 
-bool Chassis::checkIfOnRamp(){
+bool Chassis::checkIfOnRamp() {
     return(onRamp);
 }
 
@@ -207,11 +226,11 @@ bool Chassis::IsCalibrating(void) {
 }
 
 float Chassis::getPitchAng() { 
-    return(estimatedPitchAng);
+    return (estimatedPitchAng);
 }
 
-void Chassis::setMotorSpeeds(int left, int right){ //speeds -75 to 75
-    if(manualSpeedsEnable) {
+void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
+    if (manualSpeedsEnable) {
         targetSpeedLeft = left;
         targetSpeedRight = right;
     }
@@ -225,13 +244,54 @@ void Chassis::setMotorSpeeds(int left, int right){ //speeds -75 to 75
 //     wallFollowEnable = 0;
 // }
 
-float Chassis::getDistance(){
+float Chassis::getDistance() {
   uint16_t adc_out = analogRead(sharpRead);
   float voltage_out = ((float) adc_out * VREF) / 1023;
 
   float distance = 15.1 / (voltage_out - 0.333);
 
   return distance;
+}
+
+void Chassis::FollowAprilTag(float targetDistance) {
+
+    float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
+    
+    uint8_t tagCount = getTagCount();
+    if(tagCount) 
+    {
+        // tagCount = getTagCount();
+        // Serial.print(tagCount);
+        // Serial.print("\n");
+        // if (tagCount == 0) {
+        //     targetSpeedLeft = 0;
+        //     targetSpeedRight = 0;
+        // }
+        if(readTag(&tag)) {
+            float errorDistance =  getDistanceCam(tag.w) - tDistance;
+            float errorXTranslation = getDeltaCXCam(tag.cx);
+
+            targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
+            targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
+        }
+    }
+}
+
+int Chassis::DetectAprilTag() {
+
+    int retID;
+
+    uint8_t tagCount = getTagCount();
+    if(tagCount) 
+    {
+        if(readTag(&tag)) {
+            retID = tag.id;
+        }
+        else
+            retID = -1;
+    }
+
+    return retID;
 }
 
 float Chassis::rollingAverage(float arr[5]){
