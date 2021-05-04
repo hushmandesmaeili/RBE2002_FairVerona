@@ -5,6 +5,7 @@ void julietBalcony::setup(){
     c.chassis.checkRampEnable = 1;
 
     state = IDLE;
+    // pinMode(13, OUTPUT);
 }
 
 
@@ -150,6 +151,18 @@ void julietBalcony::loop(){
             state = WAIT;
             nextState = STOP;
             waitTime = 3000;
+
+            //  if(enteringState){
+            //     enteringState = 0;
+            //     // c.ledmanager.fadeInBool = 1;
+            //     c.ledmanager.fadeOutBool = 1;
+            //     delay(1000);
+            // }
+
+            // c.ledmanager.loop();
+            // if ()
+
+            // c.loop();
         break;
 
         case STOP:

@@ -6,4 +6,6 @@ void julietFinal::setup(){
 
 void julietFinal::loop(){
     common.loop();
+
+    // if ()
 }
