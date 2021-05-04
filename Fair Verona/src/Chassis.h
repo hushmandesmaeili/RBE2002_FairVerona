@@ -22,6 +22,7 @@ class Chassis{
         void FollowAprilTag(float targetDistance);
         int DetectAprilTag();
         bool checkIfOnRamp(); //getter that returns true when robot is on ramp
+        bool getHasCollided(); //true if robot has detected a collision at any point
         bool IsCalibrating(void);
         void GetXAverage(void);
         // int16_t getCountsLeft(void);
@@ -37,9 +38,12 @@ class Chassis{
         bool checkRampEnable = 0;
         bool wallFollowEnable = 0;
         bool updatePoseEnable = 0;
+        bool detectCollisionEnable = 0;
     private:
         bool manualSpeedsEnable = 1;
+        bool hasCollided;
 
+        void collisionDetect(void);
         bool UpdatePitch(void);
         float getPitchAng(void);
         void wallFollower(void);
@@ -93,7 +97,7 @@ class Chassis{
         AprilTagDatum tag;
 
         const uint8_t sharpRead = 18; //pin for Sharp IR
-        // const uint8_t sharpRead2 = 22;
+        const uint8_t sharpRead2 = 22; //A4
         const float VREF = 5.0;
         float lastSharpSamples[5];
         uint16_t sampleCount = 0;
@@ -115,7 +119,7 @@ class Chassis{
         uint32_t timestepMS = 16; // in ms
 
         
-        float estimatedPitchAng;
+        float estimatedPitchAng, pitchLast;
         const float  dataRateSec = 0.077;
         const float  sensitivity = 35;  //sensitivity of gyro in mdps/LSB
         float senseRad = (sensitivity * PI)/(180000); // rads per second per LSB

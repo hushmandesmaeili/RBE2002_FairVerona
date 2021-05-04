@@ -34,7 +34,37 @@ Scene scene = BALCONY; //set which scene it is
 //based on selected robot and scene the correct setup and loop will be run
 
 void setup() {
-  // julietBalcony.c.setup();
+  //prints out which scene is running at start
+  Serial.begin(115200);
+
+  switch(robot){
+    case ROMI:
+      Serial.print("ROMI");
+    break;
+    case TYBALT:
+      Serial.print("TYBALT");
+    break;
+    case MERCUTIO:
+      Serial.print("MERCOOLIO");
+    break;
+    case JULIET:
+      Serial.print("JULIET");
+    break;
+  }
+  Serial.print(" ");
+  switch(scene){
+    case FIGHT:
+      Serial.println("FIGHT");
+    break;
+    case BALCONY:
+      Serial.println("BALCONY");
+    break;
+    case FINALSCENE:
+      Serial.println("FINAL");
+    break;
+  }
+
+
   switch(robot){
     case ROMI:
       switch(scene){
@@ -62,6 +92,9 @@ void setup() {
         break;
         case FINALSCENE:
           julietfinal.setup();
+        break;
+        default:
+          Serial.println("incorrect selection");
         break;
       }
     break;

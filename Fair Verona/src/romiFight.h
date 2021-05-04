@@ -7,5 +7,6 @@ class romiFight{
         void setup();
         void loop();
     private:
-        commonCode common;
+        commonCode c;
+        unsigned long printTime;
 };

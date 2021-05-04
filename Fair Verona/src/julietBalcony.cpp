@@ -103,9 +103,9 @@ void julietBalcony::loop(){
         case DOWNRAMP:
             if(enteringState){
                 enteringState = 0;
-                // c.chassis.wallFollowEnable = 1;
-                // c.chassis.wallFollowDirection = 0;
-                c.chassis.setMotorSpeeds(-10, -10);
+                c.chassis.wallFollowEnable = 1;
+                c.chassis.wallFollowDirection = 0;
+                // c.chassis.setMotorSpeeds(-10, -10);s
                 goingDown = 0;
             }
 
@@ -118,6 +118,7 @@ void julietBalcony::loop(){
 
         case ONFLOOR:
             if(enteringState){
+                c.chassis.wallFollowEnable = 0;
                 enteringState = 0;
                 timeLast = millis();
                 c.chassis.setMotorSpeeds(-10, -10);

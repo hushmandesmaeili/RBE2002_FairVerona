@@ -58,6 +58,7 @@ void Chassis::loop() {
     UpdatePitch();
     // updatePose();
     if(checkRampEnable) checkRamp();
+    if(detectCollisionEnable) collisionDetect();
 
     if(PIDController::readyToPID) {
         updatePose();
@@ -225,6 +226,17 @@ bool Chassis::checkIfOnRamp() {
     return(onRamp);
 }
 
+bool Chassis::getHasCollided(){
+    return(hasCollided);
+}
+
+void Chassis::collisionDetect(){
+    if(imu.getStatus() & 0x01) {
+        if(pitchLast - estimatedPitchAng > 10) hasCollided = 1;
+        pitchLast = estimatedPitchAng;
+    }
+}
+
 void Chassis::GetXAverage(void) {
     if(sampleSize < 200)
     {
@@ -267,11 +279,11 @@ void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
 
 float Chassis::getDistance(){
   uint16_t adc_out = analogRead(sharpRead);
-//   if(wallFollowDirection) adc_out = analogRead(sharpRead);
-//   else adc_out = analogRead(sharpRead2);
+  if(wallFollowDirection) adc_out = analogRead(sharpRead);
+  else adc_out = analogRead(sharpRead2);
   float voltage_out = ((float) adc_out * VREF) / 1023;
 
-  float distance = 15.1 / (voltage_out - 0.333);
+  float distance = 15.1 / (voltage_out - 0.333); //TODO use other equation for other sensor
 
   return distance;
 }
