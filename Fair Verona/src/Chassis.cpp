@@ -58,6 +58,7 @@ void Chassis::loop() {
     UpdatePitch();
     // updatePose();
     if(checkRampEnable) checkRamp();
+    if(detectCollisionEnable) collisionDetect();
 
     if(PIDController::readyToPID) {
         updatePose();
@@ -223,6 +224,17 @@ bool Chassis::UpdatePitch(void) {
 
 bool Chassis::checkIfOnRamp() {
     return(onRamp);
+}
+
+bool Chassis::getHasCollided(){
+    return(hasCollided);
+}
+
+void Chassis::collisionDetect(){
+    if(imu.getStatus() & 0x01) {
+        if(pitchLast - estimatedPitchAng > 10) hasCollided = 1;
+        pitchLast = estimatedPitchAng;
+    }
 }
 
 void Chassis::GetXAverage(void) {

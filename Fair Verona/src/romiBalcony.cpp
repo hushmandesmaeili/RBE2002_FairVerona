@@ -3,15 +3,15 @@
 void romiBalcony::setup(){
     c.setup();
 
-    state = TEST;
+    state = IDLE;
 }
 
 void romiBalcony::loop(){
-    // if(millis() - printTime > 2000){
-    //     Serial.print(state);
-    //     printTime = millis();
-    //     // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
-    // }
+    if(millis() - printTime > 2000){
+        Serial.print(state);
+        printTime = millis();
+        // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
+    }
 
     // c.chassis.FollowAprilTag(20);
 
