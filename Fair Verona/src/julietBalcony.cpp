@@ -11,12 +11,12 @@ void julietBalcony::setup(){
 
 void julietBalcony::loop(){
     if(millis() - printTime > 500){
-        Serial.print(millis());
-        Serial.print('\t');
-        Serial.print(timeLast);
-        Serial.print('\t');
-        Serial.println(state);
-        printTime = millis();
+        // Serial.print(millis());
+        // Serial.print('\t');
+        // Serial.print(timeLast);
+        // Serial.print('\t');
+        // Serial.println(state);
+        // printTime = millis();
         // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
     }
 
@@ -147,10 +147,6 @@ void julietBalcony::loop(){
         break;
 
         case DRIVEOFF:
-            c.chassis.setMotorSpeeds(10, 10);
-            state = WAIT;
-            nextState = STOP;
-            waitTime = 3000;
 
             //  if(enteringState){
             //     enteringState = 0;
@@ -163,6 +159,21 @@ void julietBalcony::loop(){
             // if ()
 
             // c.loop();
+            // c.chassis.setMotorSpeeds(10, 10);
+            
+            if (enteringState) {
+                enteringState = 0;
+                c.chassis.SetTargetPosition(120, 30);
+            }
+
+            if (c.chassis.AtTargetPosition()) {
+                state = WAIT;
+                nextState = STOP;
+                waitTime = 3000;
+            }
+            else
+                c.chassis.MoveToPoint();
+            
         break;
 
         case STOP:
