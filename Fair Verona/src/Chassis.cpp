@@ -279,11 +279,11 @@ void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
 
 float Chassis::getDistance(){
   uint16_t adc_out = analogRead(sharpRead);
-//   if(wallFollowDirection) adc_out = analogRead(sharpRead);
-//   else adc_out = analogRead(sharpRead2);
+  if(wallFollowDirection) adc_out = analogRead(sharpRead);
+  else adc_out = analogRead(sharpRead2);
   float voltage_out = ((float) adc_out * VREF) / 1023;
 
-  float distance = 15.1 / (voltage_out - 0.333);
+  float distance = 15.1 / (voltage_out - 0.333); //TODO use other equation for other sensor
 
   return distance;
 }

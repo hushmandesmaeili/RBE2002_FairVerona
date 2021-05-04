@@ -97,7 +97,7 @@ class Chassis{
         AprilTagDatum tag;
 
         const uint8_t sharpRead = 18; //pin for Sharp IR
-        // const uint8_t sharpRead2 = 22;
+        const uint8_t sharpRead2 = 22; //A4
         const float VREF = 5.0;
         float lastSharpSamples[5];
         uint16_t sampleCount = 0;
