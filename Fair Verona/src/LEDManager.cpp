@@ -5,6 +5,7 @@ ourTimer timerLED(targetInterval);
 
 void LEDManager::setup() {
     pinMode(LEDPin, OUTPUT);
+    analogWrite(LEDPin, 0);
     timerLED.reset();
 }
 
