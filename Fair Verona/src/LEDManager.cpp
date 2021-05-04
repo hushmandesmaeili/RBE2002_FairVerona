@@ -1,56 +1,45 @@
 #include "LEDManager.h"
 
-ourTimer timerLED(30);
+const unsigned long targetInterval = 30;
+ourTimer timerLED(targetInterval);
 
 void LEDManager::setup() {
     pinMode(LEDPin, OUTPUT);
     timerLED.reset();
 }
 
-void LEDManager::fadeIn(void) {
-
-        // if(millis() - previousTime > targetInterval){
-        //  analogWrite(LEDPin, currentVal);
-        //  currentVal += changeInSupply;
-        //  previousTime = millis();
-        // }   
-
-         if(timerLED.isExpired()) {
-            analogWrite(LEDPin, currentVal);
-            currentVal = currentVal + changeInSupply;
-        }     
-        // delay(30);
-    
-       
+void LEDManager::alive(void) {
+    analogWrite(LEDPin, ALIVE);
 }
+
+void LEDManager::dead(void) {
+    analogWrite(LEDPin, DEAD);
+}
+
+void LEDManager::fadeIn(void) {
+    if(timerLED.isExpired()) {
+        analogWrite(LEDPin, brightness);
+        brightness = brightness + changeInBrightness;
+    }        
+}
+
 void LEDManager::fadeOut(void) {
-
-//  if(millis() - previousTime > targetInterval){
-//          analogWrite(LEDPin, currentVal);
-//          currentVal-=changeInSupply;
-//           previousTime = millis();
-
-//     }
-
     if(timerLED.isExpired()) {      
-        analogWrite(LEDPin, currentVal);
-        currentVal -= changeInSupply;
-        // Serial.print(currentVal);
-        // Serial.println();
+        analogWrite(LEDPin, brightness);
+        brightness = brightness - changeInBrightness;
     } 
 }
 
 void LEDManager::loop() {
     if(fadeInBool){
         fadeIn();
-        if( currentVal >= 255) fadeInBool = false;
+        if( brightness >= 255) fadeInBool = false;
     }
     if(fadeOutBool){
         fadeOut();
-        if( currentVal <= 0) {
+        if( brightness <= 0) {
             fadeOutBool = true;
-            currentVal = 0;
+            brightness = 0;
         }
     }
-    // fadeIn();
 }

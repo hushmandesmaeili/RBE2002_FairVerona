@@ -6,19 +6,21 @@
 class LEDManager{
 
     public:
+        void alive(void);
+        void dead(void);
         void fadeIn(void);
         void fadeOut(void);
-        void setup();
-        void loop();
+        void setup(void);
+        void loop(void);
         bool fadeInBool = false;
         bool fadeOutBool = false;
-
     private: 
-        const int LEDPin = 19;
-        unsigned long targetInterval = 30;
+        const int LEDPin = 13;
         unsigned long previousTime;
-        const int changeInSupply = 5;
-        int currentVal = 0;
+        const int changeInBrightness = 5;
+        int brightness = 0;
+        const int ALIVE = 255;
+        const int DEAD = 0;
 };
 
    
