@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Romi32U4.h"
+#include "ourTimer.h"
 
 class LEDManager{
 
@@ -14,10 +15,10 @@ class LEDManager{
 
     private: 
         const int LEDPin = 19;
-        unsigned long targetInterval = 500;
+        unsigned long targetInterval = 30;
         unsigned long previousTime;
         const int changeInSupply = 5;
-        int currentVal = 5;
+        int currentVal = 0;
 };
 
    
