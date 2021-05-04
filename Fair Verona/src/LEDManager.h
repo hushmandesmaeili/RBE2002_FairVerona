@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Romi32U4.h"
+#include <Arduino.h>
 #include "ourTimer.h"
 
 class LEDManager{
@@ -18,8 +19,8 @@ class LEDManager{
         const int LEDPin = 13;
         unsigned long previousTime;
         const int changeInBrightness = 5;
-        int brightness = 0;
-        const int ALIVE = 255;
+     //   int brightness = 0;
+        const int ALIVE = 249;
         const int DEAD = 0;
 };
 
