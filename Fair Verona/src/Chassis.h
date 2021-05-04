@@ -36,6 +36,7 @@ class Chassis{
         bool wallFollowDirection = 1; //1 for forwards wall follow
         bool checkRampEnable = 0;
         bool wallFollowEnable = 0;
+        bool updatePoseEnable = 0;
     private:
         bool manualSpeedsEnable = 1;
 
@@ -65,7 +66,8 @@ class Chassis{
         float targetSpeedLeft = 0;
         float targetSpeedRight = 0;
 
-        //current Pose
+        //constant max speed
+        const float MAX_SPEED_LIMIT = 30;
 
         //current target
         float x_target = 0;

@@ -52,12 +52,19 @@ void Chassis::setup(){
     imu.setAccDataOutputRate(LSM6::ODR13);
 }
 
-void Chassis::loop(){
+void Chassis::loop() {
     if(wallFollowEnable) wallFollower();
-    updateSpeeds();
+    // updateSpeeds();
     UpdatePitch();
-    updatePose();
+    // updatePose();
     if(checkRampEnable) checkRamp();
+
+    if(PIDController::readyToPID) {
+        updatePose();
+        updateSpeeds();
+    }
+
+    // if (updatePoseEnable) 
 
     // if(wallFollowEnable) {
     //     manualSpeedsEnable = 0;
@@ -69,10 +76,10 @@ void Chassis::loop(){
 void Chassis::updateSpeeds(void){
     //uses target speed values to make robot go at speed
     //currently always using velocity control
-    if(PIDController::readyToPID) //timer flag set 
-      {
-        // reset the flag
-        PIDController::readyToPID = 0;
+    // if(PIDController::readyToPID) //timer flag set 
+    //   {
+    //     // reset the flag
+    //     PIDController::readyToPID = 0;
         
         // for tracking previous counts
         static int16_t prevLeft = 0;
@@ -110,20 +117,25 @@ void Chassis::updateSpeeds(void){
         // Serial.print(effortLeft/10.0); //divide effort by 10 for better plotting
 
         // Serial.print('\n');
-      }
+    //   }
 }
 
-void Chassis::updatePose(void){
-    float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
-    // float dt = timestepMS / 1000; 
-    float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
-    float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
-    float oldTheta = theta;
-    theta = oldTheta + angVel;
-    float thetaStar = (oldTheta + theta) / 2.0;
-    x += speedCenter * cos(thetaStar); //in cm
-    y += speedCenter * sin(thetaStar); //in cm
+void Chassis::updatePose(void) {
+    // if(PIDController::readyToPID) {
+    
+        // reset the flag
+        // PIDController::readyToPID = 0;
 
+        float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
+        // float dt = timestepMS / 1000; 
+        float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
+        float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
+        float oldTheta = theta;
+        theta = oldTheta + angVel;
+        float thetaStar = (oldTheta + theta) / 2.0;
+        x += speedCenter * cos(thetaStar); //in cm
+        y += speedCenter * sin(thetaStar); //in cm
+    // }
     // Serial.print(x);
     // Serial.print("\t");
     // Serial.println(y);
@@ -141,6 +153,12 @@ void Chassis::MoveToPoint(void) {
 
     targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
     targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
+
+    if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
+        targetSpeedLeft = MAX_SPEED_LIMIT;
+
+    if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
+        targetSpeedRight = MAX_SPEED_LIMIT;
 }
 
 bool Chassis::AtTargetPosition(void) {
@@ -179,8 +197,7 @@ void Chassis::checkRamp(){
     }
 }
 
-bool Chassis::UpdatePitch(void)
-{
+bool Chassis::UpdatePitch(void) {
  if (imu.getStatus() & 0x01) {
     imu.read();
     float predictGyro = estimatedPitchAng + (dataRateSec * (imu.g.y - Bias) * senseRad);
@@ -279,6 +296,13 @@ void Chassis::FollowAprilTag(float targetDistance) {
 
             targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
             targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
+
+            if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
+                targetSpeedLeft = MAX_SPEED_LIMIT;
+
+            if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
+                targetSpeedRight = MAX_SPEED_LIMIT;
+
         }
     }
 }
