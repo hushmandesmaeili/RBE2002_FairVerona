@@ -14,7 +14,7 @@ class LEDManager{
         bool fadeOutBool = false;
 
     private: 
-        const int LEDPin = 19;
+        const int LEDPin = 5;
         unsigned long targetInterval = 30;
         unsigned long previousTime;
         const int changeInSupply = 5;

@@ -4,6 +4,7 @@ ourTimer timerLED(30);
 
 void LEDManager::setup() {
     pinMode(LEDPin, OUTPUT);
+    analogWrite(LEDPin, 0);
     timerLED.reset();
 }
 
@@ -23,6 +24,7 @@ void LEDManager::fadeIn(void) {
     
        
 }
+
 void LEDManager::fadeOut(void) {
 
 //  if(millis() - previousTime > targetInterval){
@@ -43,7 +45,7 @@ void LEDManager::fadeOut(void) {
 void LEDManager::loop() {
     if(fadeInBool){
         fadeIn();
-        if( currentVal >= 255) fadeInBool = false;
+        // if( currentVal >= 255) fadeInBool = false;
     }
     if(fadeOutBool){
         fadeOut();
