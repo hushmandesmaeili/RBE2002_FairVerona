@@ -5,7 +5,7 @@
 #include "PIDcontroller.h"
 #include "ourTimer.h"
 #include "Romi32U4Encoders.h"
-#include "LSM6.h"
+#include <LSM6.h>
 #include "apriltags.h"
 
 class Chassis{

@@ -1,5 +1,5 @@
 #include "Chassis.h"
-
+#include <LSM6.h>
 PIDController leftMotorController(12, 1, 0, 300); //start with  Kp = 1
 PIDController rightMotorController(12, 1, 0, 300); //start with  Kp = 1
 volatile uint8_t PIDController::readyToPID = 0; //a flag that is set when the PID timer overflows

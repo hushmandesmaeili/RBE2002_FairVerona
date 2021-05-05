@@ -3,3 +3,12 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode/ipch
+/sloeber.ino.cpp
+libraries
+core
+.settings
+Release
+spec.d
+.project
+.cproject
+/fair.ino
