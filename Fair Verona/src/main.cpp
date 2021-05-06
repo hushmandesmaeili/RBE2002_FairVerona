@@ -1,20 +1,20 @@
 //where we lay our scene
 
-// #include "romiFight.h"
+#include "romiFight.h"
 #include "romiBalcony.h"
-// #include "romiFinal.h"
-// #include "tybaltFight.h"
-// #include "mercutioFight.h"
+#include "romiFinal.h"
+#include "tybaltFight.h"
+#include "mercutioFight.h"
 #include "julietBalcony.h"
-// #include "julietFinal.h"
+#include "julietFinal.h"
 
-// romiFight romifight;
+romiFight romifight;
 romiBalcony romibalcony;
-// romiFinal romifinal;
-// tybaltFight tybaltfight;
-// mercutioFight mercutiofight;
+romiFinal romifinal;
+tybaltFight tybaltfight;
+mercutioFight mercutiofight;
 julietBalcony julietbalcony;
-// julietFinal julietfinal;
+julietFinal julietfinal;
 
 typedef enum {
   ROMI,
@@ -22,7 +22,7 @@ typedef enum {
   TYBALT,
   JULIET
 } Robot;
-Robot robot = ROMI; //set which robot you want it to be
+Robot robot = JULIET; //set which robot you want it to be
 
 typedef enum {
   FIGHT,
@@ -31,14 +31,14 @@ typedef enum {
 }  Scene;
 Scene scene = BALCONY; //set which scene it is
 
-void setup(){
+/*void setup(){
   Serial.begin(115200);
   switch(robot){
     case JULIET:
       julietbalcony.setup();
     break;
     case ROMI:
-      romibalcony.setup();
+      // romibalcony.setup();
     break;
  }
 }
@@ -49,13 +49,13 @@ void loop(){
     julietbalcony.loop();
   break;
   case ROMI:
-    romibalcony.loop();
+    // romibalcony.loop();
     break;
   }
-}
+}*/
 
 //based on selected robot and scene the correct setup and loop will be run
-/*
+
 void setup() {
   //prints out which scene is running at start
   Serial.begin(115200);
@@ -156,7 +156,7 @@ void loop() {
       }
     break;
   }
-}*/
+}
 
 // Two households, both alike in dignity,
 // In fair Verona, where we lay our scene,

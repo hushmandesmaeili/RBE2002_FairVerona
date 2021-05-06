@@ -9,7 +9,10 @@
 #include "apriltags.h"
 
 class Chassis{
+    
     public:
+        static Chassis& Instance(); //class method as the only access to the singleton object
+
         void setup();
         void loop();
         // void startWallFollow(); //sets flag that starts wallfollowing
@@ -48,12 +51,17 @@ class Chassis{
         bool detectCollisionEnable = 0;
         // bool updatePoseEnable = 0;
 
+        float estimatedPitchAng;
+
         //standard buffers for moving to point
         const float BUFFER_TARGET_POSE_STD = 4;
         const float BUFFER_FINAL_HEADING_STD = 0.1;
     private:
         bool manualSpeedsEnable = 1;
         bool hasCollided;
+
+        static Chassis* pInstance; //pointer to only instance of the class
+        Chassis(); //constructor
 
         void collisionDetect(void);
         bool UpdatePitch(void);
@@ -133,7 +141,7 @@ class Chassis{
         uint32_t timestepMS = 16; // in ms
 
         
-        float estimatedPitchAng, pitchLast;
+        float pitchLast;
         const float  dataRateSec = 0.077;
         const float  sensitivity = 35;  //sensitivity of gyro in mdps/LSB
         float senseRad = (sensitivity * PI)/(180000); // rads per second per LSB
