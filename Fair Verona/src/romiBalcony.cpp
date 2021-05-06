@@ -19,7 +19,7 @@ void romiBalcony::loop(){
     
     switch(state){
         case TEST:
-            c.ledmanager.fadeInBool = 1;
+            // c.ledmanager.fadeInBool = 1;
         break;
         case IDLE:
             if(enteringState){
@@ -44,6 +44,10 @@ void romiBalcony::loop(){
             state = WAIT;
             nextState = LOOKINGFORTAG;
             enteringState = 1;
+        break;
+
+        case TURNTOSTART:
+
         break;
 
         case LOOKINGFORTAG:

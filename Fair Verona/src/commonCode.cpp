@@ -6,11 +6,11 @@ void commonCode::setup(){
     // Serial.begin(115200); runs in main
     chassis.setup();
     decoder.init();
-    ledmanager.setup();
+    // ledmanager.setup();
 }
 
 void commonCode::loop(){
     chassis.loop();
     remoteCode = decoder.getKeyCode();
-    ledmanager.loop();
+    // ledmanager.loop();
 }

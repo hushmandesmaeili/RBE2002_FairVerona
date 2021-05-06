@@ -4,31 +4,41 @@ void julietBalcony::setup(){
     c.setup();
     c.chassis.checkRampEnable = 1;
 
-    state = IDLE;
+    // c.chassis.SetTargetPosition(60.0, 0.0);
+    state = WAIT;
+    nextState = APPROACH;
+    waitTime = 3000;
     // pinMode(13, OUTPUT);
 }
 
 
 void julietBalcony::loop(){
-    if(millis() - printTime > 500){
-        // Serial.print(millis());
-        // Serial.print('\t');
-        // Serial.print(timeLast);
-        // Serial.print('\t');
-        // Serial.println(state);
-        // printTime = millis();
-        // c.chassis.wallFollowDirection = !c.chassis.wallFollowDirection;
+    if(millis() - printTime > 100){
+        Serial.print(c.chassis.x);
+        Serial.print(F("\t"));
+        Serial.print(c.chassis.y);
+        Serial.print(F("\t"));
+        Serial.print(c.chassis.theta);
+        Serial.print(F("\t"));
+        Serial.print(c.chassis.th_target);
+        Serial.print(F("\t"));
+        Serial.print(c.chassis.AtTargetPosition());
+        Serial.print(F("\t"));
     }
 
     c.loop();
 
     switch(state){
         case TEST:
-            if(enteringState){
-                c.chassis.wallFollowDirection = 1;
-                c.chassis.wallFollowEnable = 1;
-                enteringState = 0;
-            }
+            // if(enteringState){
+                // c.chassis.wallFollowForwardEnable = 0;
+                // c.chassis.wallFollowBackwardEnable = 0;
+                // enteringState = 0;
+                
+            // }
+            // c.chassis.FollowAprilTag(20);
+            // c.chassis.setMotorSpeeds(-10, 10);
+            // Serial.println(c.chassis.getDistance());
         break;
         case IDLE:
             // while idling will calibrate when button a is pressed (blocking)
@@ -42,8 +52,7 @@ void julietBalcony::loop(){
 
         case APPROACH:
             if(enteringState) {
-                c.chassis.wallFollowEnable = 1;
-                c.chassis.wallFollowDirection = 1;
+                c.chassis.wallFollowForwardEnable = 1;
                 enteringState = 0;
             }
 
@@ -59,7 +68,7 @@ void julietBalcony::loop(){
             }
 
             if(!c.chassis.checkIfOnRamp()){
-                c.chassis.wallFollowEnable = 0;
+                c.chassis.wallFollowForwardEnable = 0;
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = TOPOFRAMP;
@@ -71,11 +80,11 @@ void julietBalcony::loop(){
         case TOPOFRAMP:
             if(enteringState){
                 enteringState = 0;
-                thetaLast = c.chassis.theta;
+                c.chassis.resetPose();
                 c.chassis.setMotorSpeeds(-3, 3);
             }
 
-            if(c.chassis.theta - thetaLast > 25){
+            if(c.chassis.theta > 1.57){
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = SPINBACK;
@@ -87,11 +96,11 @@ void julietBalcony::loop(){
         case SPINBACK:
             if(enteringState){
                 enteringState = 0;
-                thetaLast = c.chassis.theta;
+                c.chassis.resetPose();
                 c.chassis.setMotorSpeeds(3, -3);
             }
 
-            if(c.chassis.theta - thetaLast < -25){
+            if(c.chassis.theta - thetaLast < -1.57){
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = DOWNRAMP;
@@ -103,9 +112,7 @@ void julietBalcony::loop(){
         case DOWNRAMP:
             if(enteringState){
                 enteringState = 0;
-                c.chassis.wallFollowEnable = 1;
-                c.chassis.wallFollowDirection = 0;
-                // c.chassis.setMotorSpeeds(-10, -10);s
+                c.chassis.wallFollowBackwardEnable = 1;
                 goingDown = 0;
             }
 
@@ -116,15 +123,15 @@ void julietBalcony::loop(){
             }
         break;
 
-        case ONFLOOR:
+        case ONFLOOR: //wall extends 20 cm backwards past ramp
             if(enteringState){
-                c.chassis.wallFollowEnable = 0;
+                c.chassis.wallFollowBackwardEnable = 0;
                 enteringState = 0;
                 timeLast = millis();
                 c.chassis.setMotorSpeeds(-10, -10);
             }
 
-            if(millis() - timeLast > 3000){
+            if(millis() - timeLast > 4000){
                 enteringState = 1;
                 state = TURNAWAY;
             }
@@ -133,11 +140,11 @@ void julietBalcony::loop(){
         case TURNAWAY:
             if(enteringState){
                 enteringState = 0;
-                thetaLast = c.chassis.theta;
+                c.chassis.resetPose();
                 c.chassis.setMotorSpeeds(3, -3);
             }
 
-            if(c.chassis.theta - thetaLast < -25){
+            if(c.chassis.theta < -1.57){
                 c.chassis.setMotorSpeeds(0, 0);
                 state = WAIT;
                 nextState = DRIVEOFF;
@@ -149,31 +156,21 @@ void julietBalcony::loop(){
 
         case DRIVEOFF:
 
-            //  if(enteringState){
-            //     enteringState = 0;
-            //     // c.ledmanager.fadeInBool = 1;
-            //     c.ledmanager.fadeOutBool = 1;
-            //     delay(1000);
-            // }
-
-            // c.ledmanager.loop();
-            // if ()
-
-            // c.loop();
-            // c.chassis.setMotorSpeeds(10, 10);
-            
             if (enteringState) {
                 enteringState = 0;
-                c.chassis.SetTargetPosition(120, 30);
+                c.chassis.resetPose();
+                c.chassis.SetTargetPosition(60.0, 30.0, 1.57);
             }
 
-            if (c.chassis.AtTargetPosition()) {
+            c.chassis.MoveToPoint();
+
+            if (c.chassis.AtTargetPosition(c.chassis.BUFFER_TARGET_POSE_STD + 2, c.chassis.BUFFER_FINAL_HEADING_STD + 0.25)) {
+                c.chassis.setMotorSpeeds(15, 15);
                 state = WAIT;
                 nextState = STOP;
-                waitTime = 3000;
+                waitTime = 8000;
+                enteringState = 1;
             }
-            else
-                c.chassis.MoveToPoint();
             
         break;
 

@@ -1,20 +1,20 @@
 //where we lay our scene
 
-#include "romiFight.h"
+// #include "romiFight.h"
 #include "romiBalcony.h"
-#include "romiFinal.h"
-#include "tybaltFight.h"
-#include "mercutioFight.h"
+// #include "romiFinal.h"
+// #include "tybaltFight.h"
+// #include "mercutioFight.h"
 #include "julietBalcony.h"
-#include "julietFinal.h"
+// #include "julietFinal.h"
 
-romiFight romifight;
+// romiFight romifight;
 romiBalcony romibalcony;
-romiFinal romifinal;
-tybaltFight tybaltfight;
-mercutioFight mercutiofight;
+// romiFinal romifinal;
+// tybaltFight tybaltfight;
+// mercutioFight mercutiofight;
 julietBalcony julietbalcony;
-julietFinal julietfinal;
+// julietFinal julietfinal;
 
 typedef enum {
   ROMI,
@@ -22,7 +22,7 @@ typedef enum {
   TYBALT,
   JULIET
 } Robot;
-Robot robot = ROMI; //set which robot you want it to be
+Robot robot = JULIET; //set which robot you want it to be
 
 typedef enum {
   FIGHT,
@@ -31,36 +31,59 @@ typedef enum {
 }  Scene;
 Scene scene = BALCONY; //set which scene it is
 
-//based on selected robot and scene the correct setup and loop will be run
+void setup(){
+  Serial.begin(115200);
+  switch(robot){
+    case JULIET:
+      julietbalcony.setup();
+    break;
+    case ROMI:
+      romibalcony.setup();
+    break;
+ }
+}
 
+void loop(){
+  switch(robot){
+  case JULIET:
+    julietbalcony.loop();
+  break;
+  case ROMI:
+    romibalcony.loop();
+    break;
+  }
+}
+
+//based on selected robot and scene the correct setup and loop will be run
+/*
 void setup() {
   //prints out which scene is running at start
   Serial.begin(115200);
 
   switch(robot){
     case ROMI:
-      Serial.print("ROMI");
+      Serial.print(F("ROMI"));
     break;
     case TYBALT:
-      Serial.print("TYBALT");
+      Serial.print(F("TYBALT"));
     break;
     case MERCUTIO:
-      Serial.print("MERCOOLIO");
+      Serial.print(F("MERCOOLIO"));
     break;
     case JULIET:
-      Serial.print("JULIET");
+      Serial.print(F("JULIET"));
     break;
   }
   Serial.print(" ");
   switch(scene){
     case FIGHT:
-      Serial.println("FIGHT");
+      Serial.println(F("FIGHT"));
     break;
     case BALCONY:
-      Serial.println("BALCONY");
+      Serial.println(F("BALCONY"));
     break;
     case FINALSCENE:
-      Serial.println("FINAL");
+      Serial.println(F("FINAL"));
     break;
   }
 
@@ -94,7 +117,7 @@ void setup() {
           julietfinal.setup();
         break;
         default:
-          Serial.println("incorrect selection");
+          Serial.println(F("incorrect selection"));
         break;
       }
     break;
@@ -133,7 +156,7 @@ void loop() {
       }
     break;
   }
-}
+}*/
 
 // Two households, both alike in dignity,
 // In fair Verona, where we lay our scene,

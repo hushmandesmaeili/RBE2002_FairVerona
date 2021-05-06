@@ -34,13 +34,14 @@ void Chassis::setup(){
 
     if (!imu.init())
     {
+        // imu.init();
         // Failed to detect the LSM6.
         ledRed(1);
-        while(1)
-        {
+        // while(1)
+        // {
         Serial.println(F("Failed to detect the LSM6."));
         delay(100);
-        }
+        // }
     }
 
     imu.enableDefault();
@@ -53,16 +54,22 @@ void Chassis::setup(){
 }
 
 void Chassis::loop() {
-    if(wallFollowEnable) wallFollower();
-    // updateSpeeds();
+    // Serial.print(wallFollowForwardEnable);
+    // Serial.print('\t');
+    // Serial.print(wallFollowBackwardEnable);
+    // Serial.print('\n');
+    
+    if(wallFollowForwardEnable || wallFollowBackwardEnable) { 
+        wallFollower(); 
+    }
     UpdatePitch();
-    // updatePose();
     if(checkRampEnable) checkRamp();
-    if(detectCollisionEnable) collisionDetect();
+    // if(detectCollisionEnable) collisionDetect();
 
     if(PIDController::readyToPID) {
+        PIDController::readyToPID = 0;
         updatePose();
-        updateSpeeds();
+        updateSpeeds(); 
     }
 
     // if (updatePoseEnable) 
@@ -77,11 +84,9 @@ void Chassis::loop() {
 void Chassis::updateSpeeds(void){
     //uses target speed values to make robot go at speed
     //currently always using velocity control
-    // if(PIDController::readyToPID) //timer flag set 
-    //   {
-    //     // reset the flag
-    //     PIDController::readyToPID = 0;
-        
+    // if(PIDController::readyToPID) {
+    //     PIDController::readyToPID = 0;    
+
         // for tracking previous counts
         static int16_t prevLeft = 0;
         static int16_t prevRight = 0;
@@ -109,26 +114,17 @@ void Chassis::updateSpeeds(void){
         // motors.setEfforts(effortLeft, 0); 
         motors.setEfforts(effortLeft, effortRight); 
 
-        // Serial.print(millis());
-        // Serial.print('\t');
-        // Serial.print(targetLeft);
-        // Serial.print('\t');
-        // Serial.print(speedLeft);
-        // Serial.print('\t');
-        // Serial.print(effortLeft/10.0); //divide effort by 10 for better plotting
-
-        // Serial.print('\n');
-    //   }
+        // Serial.println("UPDATE SPEEDS");
+    // }
 }
 
 void Chassis::updatePose(void) {
+
     // if(PIDController::readyToPID) {
-    
-        // reset the flag
-        // PIDController::readyToPID = 0;
+    //     PIDController::readyToPID = 0;
 
         float ticks_per_cm = ticks_per_rotation / (PI * wheel_diam); 
-        // float dt = timestepMS / 1000; 
+        float dt = timestepMS / 1000; 
         float angVel = (speedRight - speedLeft) / (wheel_track * ticks_per_cm); //in rads per interval
         float speedCenter = (speedRight + speedLeft) / (2.0 * ticks_per_cm); //in cm per interval
         float oldTheta = theta;
@@ -137,33 +133,56 @@ void Chassis::updatePose(void) {
         x += speedCenter * cos(thetaStar); //in cm
         y += speedCenter * sin(thetaStar); //in cm
     // }
+    // Serial.print(theta);
     // Serial.print(x);
-    // Serial.print("\t");
-    // Serial.println(y);
+    // Serial.print(F("\t"));
+    // Serial.print(y);
+    // Serial.print(F("\t"));
+    // Serial.print(theta);
+    // Serial.print(F("\n"));
+}
+
+void Chassis::resetPose(void) {
+    x = 0;
+    y = 0;
+    theta = 0;
 }
 
 void Chassis::MoveToPoint(void) {
     float errorDistance = sqrt(pow((x - x_target), 2) + pow((y - y_target), 2));
     float internalTargetTheta = atan2(y_target - y, x_target - x);
     float errorTheta =  internalTargetTheta - theta;
+    float errorHeading = th_target - theta;
 
-    // Serial.print(errorDistance);
-    // Serial.print("\t");
+    Serial.print("InternalTheta: ");
+    Serial.print(internalTargetTheta);
+    Serial.print("\n");
     // Serial.print(errorTheta);
     // Serial.print("\n");
 
-    targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
-    targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
+    // targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta;
+    // targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta;
 
-    if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
-        targetSpeedLeft = MAX_SPEED_LIMIT;
+    targetSpeedLeft = kpD * errorDistance - kpTheta * errorTheta + kpFinalHeading * errorHeading;
+    targetSpeedRight = kpD * errorDistance + kpTheta * errorTheta - kpFinalHeading * errorHeading;
 
-    if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
-        targetSpeedRight = MAX_SPEED_LIMIT;
+    // if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
+    //     targetSpeedLeft = MAX_SPEED_LIMIT;
+
+    // if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
+    //     targetSpeedRight = MAX_SPEED_LIMIT;
 }
 
-bool Chassis::AtTargetPosition(void) {
-    bool retValue = (abs(x - x_target) <= BUFFER_TARGET_POSE && abs(y - y_target) <= BUFFER_TARGET_POSE);
+bool Chassis::AtTargetPosition(){
+    AtTargetPosition(BUFFER_TARGET_POSE_STD, BUFFER_FINAL_HEADING_STD);
+}
+
+bool Chassis::AtTargetPosition(float buffer_xy, float buffer_theta) {
+    bool retValue = (abs(x - x_target) <= buffer_xy) 
+        && (abs(y - y_target) <= buffer_xy) 
+        && ((abs(theta - th_target)) <= buffer_theta);
+        // bool retValue = sqrt(pow((x - x_target), 2) + pow((y - y_target), 2)) <= BUFFER_TARGET_POSE
+        //                 && abs(theta - th_target) <= BUFFER_FINAL_HEADING;
 
     return retValue;
 }
@@ -174,18 +193,27 @@ void Chassis::wallFollower(void){
         sampleCount++;
         lastSharpSamples[sampleCount % 5] = getDistance();
         float avg_distance = rollingAverage(lastSharpSamples);
-        float error = avg_distance - targetDistance;
+
+        float error;
+
+        if(wallFollowForwardEnable) {
+            error = avg_distance - targetDistanceFW;
+        }
+        else if (wallFollowBackwardEnable) {
+            error = avg_distance - targetDistanceBW;
+        }
        
         turnEffort = wallFollow.ComputeEffort(error);
-        if(wallFollowDirection){
+        if(wallFollowForwardEnable) {
             targetSpeedLeft =  targetSpeed + turnEffort;
             targetSpeedRight = targetSpeed - turnEffort;
         }
-        else {
+        else if (wallFollowBackwardEnable) {
             targetSpeedLeft =  - (targetSpeed + turnEffort);
             targetSpeedRight = - (targetSpeed - turnEffort);
         }
-
+        Serial.println(F("WALLFOLLOWER"));
+        
        
     }
 }
@@ -199,26 +227,22 @@ void Chassis::checkRamp(){
 }
 
 bool Chassis::UpdatePitch(void) {
- if (imu.getStatus() & 0x01) {
-    imu.read();
-    float predictGyro = estimatedPitchAng + (dataRateSec * (imu.g.y - Bias) * senseRad);
-    float obsPitch = atan2((double)(imu.a.x - accXoffset),(double)(imu.a.z));
-    estimatedPitchAng = kappa * predictGyro + (1 - kappa) * obsPitch;
-    Bias = Bias + E*(predictGyro - obsPitch);  
     
-    // Serial.print("est pitch: ");
-    // Serial.print(estimatedPitchAng);
-    // Serial.print('\t');
-    // Serial.print(Bias);
-    // Serial.print('\t');
-    //  Serial.print(imu.a.x);
-    // Serial.print('\t');
-    // Serial.print(accXoffset);
-    // Serial.print('\t');
-    return true;    
-  }
+    if (imu.getStatus() & 0x01) {
+        imu.read();
+        float predictGyro = estimatedPitchAng + (dataRateSec * (imu.g.y - Bias) * senseRad);
+        float obsPitch = atan2((double)(imu.a.x - accXoffset),(double)(imu.a.z));
+        estimatedPitchAng = kappa * predictGyro + (1 - kappa) * obsPitch;
+        Bias = Bias + E*(predictGyro - obsPitch); 
+
+        // Serial.print(estimatedPitchAng);
+        // Serial.print("\n"); 
+        
+        return true;    
+    }
     else
         return false;
+    
 
 }
 
@@ -279,8 +303,8 @@ void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
 
 float Chassis::getDistance(){
   uint16_t adc_out = analogRead(sharpRead);
-  if(wallFollowDirection) adc_out = analogRead(sharpRead);
-  else adc_out = analogRead(sharpRead2);
+  if(wallFollowForwardEnable) adc_out = analogRead(sharpRead);
+  else if (wallFollowBackwardEnable) adc_out = analogRead(sharpRead2);
   float voltage_out = ((float) adc_out * VREF) / 1023;
 
   float distance = 15.1 / (voltage_out - 0.333); //TODO use other equation for other sensor
@@ -295,13 +319,6 @@ void Chassis::FollowAprilTag(float targetDistance) {
     uint8_t tagCount = getTagCount();
     if(tagCount) 
     {
-        // tagCount = getTagCount();
-        // Serial.print(tagCount);
-        // Serial.print("\n");
-        // if (tagCount == 0) {
-        //     targetSpeedLeft = 0;
-        //     targetSpeedRight = 0;
-        // }
         if(readTag(&tag)) {
             float errorDistance =  getDistanceCam(tag.w) - tDistance;
             float errorXTranslation = getDeltaCXCam(tag.cx);
@@ -309,11 +326,11 @@ void Chassis::FollowAprilTag(float targetDistance) {
             targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
             targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
 
-            if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
-                targetSpeedLeft = MAX_SPEED_LIMIT;
+            // if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
+            //     targetSpeedLeft = MAX_SPEED_LIMIT;
 
-            if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
-                targetSpeedRight = MAX_SPEED_LIMIT;
+            // if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
+            //     targetSpeedRight = MAX_SPEED_LIMIT;
 
         }
     }
