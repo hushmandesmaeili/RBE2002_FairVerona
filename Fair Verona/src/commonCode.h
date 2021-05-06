@@ -6,11 +6,14 @@
 #include "Chassis.h"
 #include "RemoteConstants.h"
 #include "IRdecoder.h"
+#include "servo32u4.h"
+#include "poison.h"
 
 class commonCode{
     public:
+        Poison poison;
         Chassis chassis;
-        // Romi32U4ButtonA buttonA;
+        Romi32U4ButtonA buttonA;
         Romi32U4ButtonB buttonB;
         Romi32U4ButtonC buttonC;
 
@@ -18,5 +21,6 @@ class commonCode{
         void loop();
 
         int16_t remoteCode;
+        Poison poison;
     private:
 };

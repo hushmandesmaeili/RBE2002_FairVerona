@@ -1,5 +1,5 @@
 #include "romiBalcony.h"
-
+#include "servo32u4.h"
 void romiBalcony::setup(){
     c.setup();
 
@@ -17,8 +17,25 @@ void romiBalcony::loop(){
 
     c.loop();
     
+
+
     switch(state){
-    
+        default:
+            break;
+        case TEST:
+            if( c.buttonA.getSingleDebouncedPress()){
+                enteringState = 0; 
+                c.poison.setup();
+                c.poison.up();
+                Serial.begin(115200); 
+                Serial.print(c.poison.getposition());
+                Serial.print("\n");
+                c.poison.down();
+
+            }
+
+
+
         case IDLE:
             if(enteringState){
                 enteringState = 0;

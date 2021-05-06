@@ -38,6 +38,8 @@ void setup() {
   switch(robot){
     case ROMI:
       switch(scene){
+        default:  // added for testing servo
+        break;    // "                      "
         case FIGHT:
           romifight.setup();
         break;

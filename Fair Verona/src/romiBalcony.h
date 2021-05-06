@@ -26,4 +26,6 @@ class romiBalcony{
 
     bool enteringState = 1;
     unsigned long timeLast, waitTime, printTime;
+    
+    
 };
