@@ -154,9 +154,9 @@ void Chassis::MoveToPoint(void) {
     float errorTheta =  internalTargetTheta - theta;
     float errorHeading = th_target - theta;
 
-    Serial.print("InternalTheta: ");
-    Serial.print(internalTargetTheta);
-    Serial.print("\n");
+    // Serial.print("InternalTheta: ");
+    // Serial.print(internalTargetTheta);
+    // Serial.print("\n");
     // Serial.print(errorTheta);
     // Serial.print("\n");
 
@@ -174,7 +174,7 @@ void Chassis::MoveToPoint(void) {
 }
 
 bool Chassis::AtTargetPosition(){
-    AtTargetPosition(BUFFER_TARGET_POSE_STD, BUFFER_FINAL_HEADING_STD);
+    return(AtTargetPosition(BUFFER_TARGET_POSE_STD, BUFFER_FINAL_HEADING_STD));
 }
 
 bool Chassis::AtTargetPosition(float buffer_xy, float buffer_theta) {
