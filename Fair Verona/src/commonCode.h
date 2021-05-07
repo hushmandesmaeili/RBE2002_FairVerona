@@ -7,6 +7,7 @@
 #include "RemoteConstants.h"
 #include "IRdecoder.h"
 #include "poison.h"
+#include "simpleLED.h"
 // #include "LEDManager.h"
 
 class commonCode{
@@ -18,6 +19,7 @@ class commonCode{
         Romi32U4ButtonC buttonC;
         // LEDManager ledmanager;
         Poison poison;
+        SimpleLED simpleLED;
 
         void setup();
         void loop();
