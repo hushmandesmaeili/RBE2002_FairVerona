@@ -13,22 +13,22 @@ void romiFinal::setup(){
 void romiFinal::loop() {
     if(millis() - printTime > 500){
         // Serial.print(state);
-        Serial.print(c.chassis.getDistanceCamera());
+        Serial.print(c.chassis->getDistanceCamera());
         Serial.print("\n");
     }
 
     c.loop();
-    // Serial.println(c.chassis.getDistanceCamera());
+    // Serial.println(c.chassis->getDistanceCamera());
     
     switch(state){
     
     case TEST:
-        if (enteringState) {
-            enteringState = 0;
-            // c.chassis.FollowAprilTag(15, 10);
-        }
+        // if (enteringState) {
+            // enteringState = 0;
+            // c.chassis->FollowAprilTag(15, 10);
+        // }
 
-        c.chassis.FollowAprilTag(15, 15);
+        // c.chassis->FollowAprilTag(15, 15);
 
         // if (c.tapper.CheckTap()) {
         //     enteringState = 1;
@@ -38,6 +38,8 @@ void romiFinal::loop() {
     break;
 
     case IDLE:
+
+        // ADD decoder
             
     break;
 
@@ -45,45 +47,57 @@ void romiFinal::loop() {
 
         if (enteringState) {
             enteringState = 0;
-            c.chassis.setMotorSpeeds(10, 10);
+            c.chassis->setMotorSpeeds(10, 10);
         }
         
-        if (c.chassis.getDistanceCamera() <= 20) {
-            c.chassis.setMotorSpeeds(0, 0);
+        if (c.chassis->getDistanceCamera() <= 20) {
+            c.chassis->setMotorSpeeds(0, 0);
             enteringState = 1;
-            // state = STOP ;
             state = WAIT;
-            nextState = DRIVETOCOLLISION;
+            nextState = DUMPPOISON;
             waitTime = 3000;
         }
             
     break;
 
     case DUMPPOISON:
+
+        if (enteringState) {
+            enteringState = 0;
+            c.poison.down();
+        }
+
+        if (c.poison.done()) {
+            enteringState = 1;
+                state = WAIT;
+                nextState = DRIVETOCOLLISION;
+                waitTime = 2000;
+        }
             
     break;
 
     case DRIVETOCOLLISION:
          
-        c.chassis.FollowAprilTag(0, 10);
+        c.chassis->FollowAprilTag(0, 10);
         
         if (c.tapper.CheckTap()) {
             enteringState = 1;
-            state = STOP;
+            state = DIE;
         }
             
     break;
 
     case DIE:
 
-    //TURN LED OFF
+        c.simpleLED.off();
+        state = STOP; 
             
     break;
 
     case STOP:
             if(enteringState){
                 enteringState = 0;
-                c.chassis.setMotorSpeeds(0, 0);
+                c.chassis->setMotorSpeeds(0, 0);
             }
         break;
 

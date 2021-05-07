@@ -7,5 +7,5 @@ class SimpleLED{
         void on();
         void off();
     private:
-        const int LEDPin = 13;
+        const int LEDPin = 21;  //Also Pin A
 };

@@ -9,6 +9,8 @@ void commonCode::setup(){
     if (tapDetectorOn)
         tapper.Init();
     decoder.init();
+    poison.setup();
+    simpleLED.setup();
     // ledmanager.setup();
 }
 

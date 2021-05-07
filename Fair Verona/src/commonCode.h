@@ -28,6 +28,5 @@ class commonCode{
 
         int16_t remoteCode;
 
-        bool tapDetectorOn = 0;
-    private:
+        bool tapDetectorOn = 1;
 };

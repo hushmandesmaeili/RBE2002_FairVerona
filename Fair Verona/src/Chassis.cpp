@@ -197,6 +197,18 @@ bool Chassis::AtTargetPosition(float buffer_xy, float buffer_theta) {
     return retValue;
 }
 
+//Function to drive in circle
+//Takes radius in cm and speed in ticks/interval as arguments
+void Chassis::driveCircle(float radius, float speed) {
+    float speedRight = ((wheel_track * speed) / (2 * radius)) + speed;  //speed right in ticks/int
+    float speedLeft = (2 * speed) - speedRight;                         //speed left in ticks/int
+    // speedRight = speedRight / ticksToCMSpeed;                           //speed right in ticks/int
+    // speedLeft = speedLeft / ticksToCMSpeed;
+    
+    targetSpeedRight = speedRight;                                      //set target speed right for speed controller
+    targetSpeedLeft = speedLeft;                                        //set target speed left for speed controller
+}
+
 void Chassis::wallFollower(void){
     //when wall follow timer triggers, set target speeds to feed to velocity controller
     if(wallFollowTimer.isExpired()){ //for using sharp IR

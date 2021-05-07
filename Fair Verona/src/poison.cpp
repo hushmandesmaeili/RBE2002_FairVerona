@@ -5,13 +5,16 @@ void Poison::setup(void){
     servo.Attach(); 
     servo.SetMinMaxUS(900, 2100); 
     pinMode(servoPotPin, INPUT); //servo input pin
+    up();
 }
 
+// Initial position
 void Poison::up(){
-    servo.Write(1800);
+    servo.Write(1800); //was 1800
     setPoint = UP;
 }
 
+//Dumping poisition
 void Poison::down(){
     servo.Write(900);
     setPoint = DOWN;

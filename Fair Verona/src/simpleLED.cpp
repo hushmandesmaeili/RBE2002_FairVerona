@@ -2,6 +2,7 @@
 
 void SimpleLED::setup(){
     pinMode(LEDPin, OUTPUT);
+    on();
 }
 
 void SimpleLED::on(){

@@ -13,6 +13,8 @@ class TapDetector
 public: 
   void Init(void);
   bool CheckTap(void);
+
+  bool fastSettingsEnable = 1;
 };
 
 #endif

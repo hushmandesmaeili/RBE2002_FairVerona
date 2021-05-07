@@ -24,6 +24,7 @@ class Chassis{
         void MoveToPoint(void);
         bool AtTargetPosition();
         bool AtTargetPosition(float buffer_xy, float buffer_theta);
+        void driveCircle(float radius, float speed);
         void FollowAprilTag(float targetDistance);
         int DetectAprilTag();
         bool checkIfOnRamp(); //getter that returns true when robot is on ramp
@@ -50,7 +51,6 @@ class Chassis{
         bool checkRampEnable = 0;
         // bool wallFollowEnable = 0;
         bool updatePoseEnable = 0;
-        bool detectCollisionEnable = 0;
         // bool updatePoseEnable = 0;
 
         float estimatedPitchAng;
@@ -79,6 +79,7 @@ class Chassis{
         float wheel_track = 14.3; //cm
         float wheel_diam = 7.085; //cm
         float ticks_per_rotation = 1440; // from the datasheet
+        const float ticksToCMSpeed = 0.96607; 
 
         //actual speed
         int16_t speedLeft = 0;

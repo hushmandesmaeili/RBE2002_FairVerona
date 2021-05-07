@@ -24,7 +24,8 @@ void TapDetector::Init(void)
     imu.setFullScaleAcc(LSM6::ACC_FS2);
     imu.setAccDataOutputRate(LSM6::ODR104);
 
-    imu.writeReg(0x59, 0x04); 
+    if(fastSettingsEnable) imu.writeReg(0x59, 0x04); //enable a higher threshold if fast mode enabled
+    else imu.writeReg(0x59, 0x03); 
     imu.writeReg(0x58, 0x0C);
 
     //FS2 and 0x04 threshold work for speed 10 and 25 

@@ -3,6 +3,7 @@
 void julietFinal::setup() {
     c.tapDetectorOn = 1;
     c.setup();
+    c.simpleLED.off();
     enteringState = 1;
     state = WAIT;
     nextState = WAITFORCOLLISION;
@@ -10,56 +11,52 @@ void julietFinal::setup() {
 }
 
 void julietFinal::loop() {
-    
-    c.loop();
 
      if(millis() - printTime > 500){
         // Serial.print(state);
     }
 
     c.loop();
-    // Serial.println(c.chassis.getDistanceCamera());
+    // Serial.println(c.chassis->getDistanceCamera());
     
     switch(state){
     
     case TEST:
-        if (enteringState) {
-            enteringState = 0;
-            // c.chassis.FollowAprilTag(15, 10);
-        }
-
-        // c.chassis.FollowAprilTag(15, 15);
-
-        // if (c.tapper.CheckTap()) {
-        //     enteringState = 1;
-        //     state = STOP;
+        // if (enteringState) {
+        //     enteringState = 0;
+            // c.chassis->FollowAprilTag(15, 10);
         // }
 
     break;
 
     case IDLE:
+
+        // ADD decoder
             
     break;
 
     case WAITFORCOLLISION:
 
-    if (c.tapper.CheckTap()) {
-        state = WAIT;
-        nextState = AWAKE;
-        waitTime = 4000;
-        enteringState = 1;
-    }
+        if (c.tapper.CheckTap()) {
+            state = WAIT;
+            nextState = AWAKE;
+            waitTime = 1000;
+            enteringState = 1;
+        }
             
     break;
 
     case AWAKE:
-            
+        
+        c.simpleLED.on();
+        state = STOP;
+
     break;
 
     case STOP:
             if(enteringState){
                 enteringState = 0;
-                c.chassis.setMotorSpeeds(0, 0);
+                c.chassis->setMotorSpeeds(0, 0);
             }
         break;
 
@@ -78,6 +75,5 @@ void julietFinal::loop() {
     break;
     
     
-    // if ()
+    }
 }
-

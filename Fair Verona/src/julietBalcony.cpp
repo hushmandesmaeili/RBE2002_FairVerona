@@ -1,6 +1,7 @@
 #include "julietBalcony.h"
 
 void julietBalcony::setup(){
+    c.tapDetectorOn = 0;
     c.setup();
     c.chassis->checkRampEnable = 1;
 

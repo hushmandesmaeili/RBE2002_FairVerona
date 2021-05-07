@@ -7,5 +7,20 @@ class mercutioFight{
         void setup();
         void loop();
     private:
-        commonCode common;
+        commonCode c;
+
+    typedef enum{
+        IDLE,
+        CIRCLE,
+        WAITTODIE,
+        STOP,
+        WAIT,
+        TEST
+    } State;
+    State state;
+    State nextState;
+
+    bool enteringState = 1;
+    unsigned long timeLast, waitTime, printTime;
+    float thetaLast, turnAngle;
 };
