@@ -6,6 +6,8 @@ void commonCode::setup(){
     chassis = &chassis->Instance();
     // Serial.begin(115200); runs in main
     chassis->setup();
+    if (tapDetectorOn)
+        tapper.Init();
     decoder.init();
     // ledmanager.setup();
 }

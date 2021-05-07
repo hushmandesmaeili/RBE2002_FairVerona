@@ -6,6 +6,7 @@
 #include "Chassis.h"
 #include "RemoteConstants.h"
 #include "IRdecoder.h"
+#include "tap_detector.h"
 #include "poison.h"
 #include "simpleLED.h"
 // #include "LEDManager.h"
@@ -18,6 +19,7 @@ class commonCode{
         Romi32U4ButtonB buttonB;
         Romi32U4ButtonC buttonC;
         // LEDManager ledmanager;
+        TapDetector tapper;
         Poison poison;
         SimpleLED simpleLED;
 
@@ -25,5 +27,7 @@ class commonCode{
         void loop();
 
         int16_t remoteCode;
+
+        bool tapDetectorOn = 0;
     private:
 };
