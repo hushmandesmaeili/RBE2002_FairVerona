@@ -254,13 +254,6 @@ bool Chassis::getHasCollided(){
     return(hasCollided);
 }
 
-void Chassis::collisionDetect(){
-    if(imu.getStatus() & 0x01) {
-        if(pitchLast - estimatedPitchAng > 10) hasCollided = 1;
-        pitchLast = estimatedPitchAng;
-    }
-}
-
 void Chassis::GetXAverage(void) {
     if(sampleSize < 200)
     {
@@ -293,14 +286,6 @@ void Chassis::setMotorSpeeds(int left, int right) { //speeds -75 to 75
     // }
 }
 
-// void Chassis::startWallFollow(){
-//     wallFollowEnable = 1;
-// }
-
-// void Chassis::stopWallFollow(){
-//     wallFollowEnable = 0;
-// }
-
 float Chassis::getDistance(){
   uint16_t adc_out = analogRead(sharpRead);
   if(wallFollowForwardEnable) adc_out = analogRead(sharpRead);
@@ -312,10 +297,13 @@ float Chassis::getDistance(){
   return distance;
 }
 
+//Cannot read past 25 cm
 void Chassis::FollowAprilTag(float targetDistance) {
 
     float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
+    static float lastTag = 0;      //last millis a tag was read
     
+    lastTag = millis();
     uint8_t tagCount = getTagCount();
     if(tagCount) 
     {
@@ -325,15 +313,54 @@ void Chassis::FollowAprilTag(float targetDistance) {
 
             targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
             targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
-
-            // if (abs(targetSpeedLeft) > MAX_SPEED_LIMIT)
-            //     targetSpeedLeft = MAX_SPEED_LIMIT;
-
-            // if (abs(targetSpeedRight) > MAX_SPEED_LIMIT)
-            //     targetSpeedRight = MAX_SPEED_LIMIT;
-
         }
     }
+    else if (millis() - lastTag > CAMERA_TIMEOUT) {
+        targetSpeedLeft = 0;
+        targetSpeedRight = 0;
+    }
+}
+
+//Cannot read past 25 cm
+void Chassis::FollowAprilTag(float targetDistance, float maxSpeed) { //float distance float max speed
+
+    float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
+    static float lastTag = 0;      //last millis a tag was read
+    uint8_t tagCount = getTagCount();
+    if(tagCount) 
+    {
+        lastTag = millis();
+        if(readTag(&tag)) {
+            
+            float errorDistance =  getDistanceCam(tag.w) - tDistance;
+            float errorXTranslation = getDeltaCXCam(tag.cx);
+
+            targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
+            targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
+
+            if (abs(targetSpeedLeft) > maxSpeed)
+                targetSpeedLeft = maxSpeed;
+
+            if (abs(targetSpeedRight) > maxSpeed)
+                targetSpeedRight = maxSpeed;
+        }
+    } 
+    else if (millis() - lastTag > CAMERA_TIMEOUT) {
+        targetSpeedLeft = 0;
+        targetSpeedRight = 0;
+    }
+}
+
+float Chassis::getDistanceCamera() {
+    float distance = 33;                //not zero, larger than 30
+     uint8_t tagCount = getTagCount();
+    if(tagCount) 
+    {
+        if(readTag(&tag))
+            distance = getDistanceCam(tag.w) - CAMERA_OFFSET - TAG_OFFSET;
+    }
+
+    return distance;
 }
 
 int Chassis::DetectAprilTag() {
@@ -365,14 +392,6 @@ float Chassis::rollingAverage(float arr[5]){
 
   return avg;
 }
-
-// int16_t Chassis::getCountsLeft(void){
-//     return(countsLeft);
-// }
-
-// int16_t Chassis::getCountsRight(void){
-//     return(countsRight);
-// }
 
 ISR(TIMER4_OVF_vect)
 {

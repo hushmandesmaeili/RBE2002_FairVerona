@@ -30,6 +30,8 @@ class Chassis{
         void updatePose(void);
         void updateSpeeds(void);
         float getDistance();
+        void FollowAprilTag(float targetDistance, float maxSpeed);
+        float getDistanceCamera();
         // int16_t getCountsLeft(void);
         // int16_t getCountsRight(void);
 
@@ -103,7 +105,9 @@ class Chassis{
         const float kp_alignment = 0.2;
 
         //constant for camera offset from front of chassis
+        const float CAMERA_TIMEOUT= 500;
         const float CAMERA_OFFSET = 12.0;
+        const float TAG_OFFSET = 7.5;
 
         //AprilTag data structure
         AprilTagDatum tag;

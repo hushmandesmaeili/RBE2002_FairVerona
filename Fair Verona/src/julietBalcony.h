@@ -21,14 +21,14 @@ class julietBalcony{
         WAIT,
         STOP,
         TEST
-    } State;
-    State state;
-    State nextState;
+        } State;
+        State state;
+        State nextState;
 
-    bool enteringState = 1;
+        bool enteringState = 1;
 
-    bool goingDown;
-    unsigned long timeLast, waitTime, printTime;
-    float thetaLast = 0;
-    int speed;
+        bool goingDown;
+        unsigned long timeLast, waitTime, printTime;
+        float thetaLast = 0;
+        int speed;
 };

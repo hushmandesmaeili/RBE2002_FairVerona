@@ -2,7 +2,7 @@
 
 // #include "romiFight.h"
 #include "romiBalcony.h"
-// #include "romiFinal.h"
+#include "romiFinal.h"
 // #include "tybaltFight.h"
 // #include "mercutioFight.h"
 #include "julietBalcony.h"
@@ -10,7 +10,7 @@
 
 // romiFight romifight;
 romiBalcony romibalcony;
-// romiFinal romifinal;
+romiFinal romifinal;
 // tybaltFight tybaltfight;
 // mercutioFight mercutiofight;
 julietBalcony julietbalcony;
@@ -29,7 +29,7 @@ typedef enum {
   BALCONY,
   FINALSCENE
 }  Scene;
-Scene scene = BALCONY; //set which scene it is
+Scene scene = FINALSCENE; //set which scene it is
 
 void setup(){
   Serial.begin(115200);
@@ -38,7 +38,15 @@ void setup(){
       julietbalcony.setup();
     break;
     case ROMI:
-      romibalcony.setup();
+      switch(scene){
+        case BALCONY:
+          romibalcony.setup();
+        break;
+        case FINALSCENE:
+          romifinal.setup();
+        break;
+      }
+      
     break;
  }
 }
@@ -49,8 +57,15 @@ void loop(){
     julietbalcony.loop();
   break;
   case ROMI:
-    romibalcony.loop();
-    break;
+    switch(scene){
+      case BALCONY:
+        romibalcony.loop();
+      break;
+      case FINALSCENE:
+        romifinal.loop();
+      break;
+    }
+  break;
   }
 }
 
