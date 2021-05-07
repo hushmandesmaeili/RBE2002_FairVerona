@@ -1,20 +1,20 @@
 //where we lay our scene
 
-// #include "romiFight.h"
+#include "romiFight.h"
 #include "romiBalcony.h"
 #include "romiFinal.h"
-// #include "tybaltFight.h"
-// #include "mercutioFight.h"
+#include "tybaltFight.h"
+#include "mercutioFight.h"
 #include "julietBalcony.h"
-// #include "julietFinal.h"
+#include "julietFinal.h"
 
-// romiFight romifight;
+romiFight romifight;
 romiBalcony romibalcony;
 romiFinal romifinal;
-// tybaltFight tybaltfight;
-// mercutioFight mercutiofight;
+tybaltFight tybaltfight;
+mercutioFight mercutiofight;
 julietBalcony julietbalcony;
-// julietFinal julietfinal;
+julietFinal julietfinal;
 
 typedef enum {
   ROMI,
@@ -22,31 +22,23 @@ typedef enum {
   TYBALT,
   JULIET
 } Robot;
-Robot robot = ROMI; //set which robot you want it to be
+Robot robot = JULIET; //set which robot you want it to be
 
 typedef enum {
   FIGHT,
   BALCONY,
   FINALSCENE
 }  Scene;
-Scene scene = FINALSCENE; //set which scene it is
+Scene scene = BALCONY; //set which scene it is
 
-void setup(){
+/*void setup(){
   Serial.begin(115200);
   switch(robot){
     case JULIET:
       julietbalcony.setup();
     break;
     case ROMI:
-      switch(scene){
-        case BALCONY:
-          romibalcony.setup();
-        break;
-        case FINALSCENE:
-          romifinal.setup();
-        break;
-      }
-      
+      // romibalcony.setup();
     break;
  }
 }
@@ -57,20 +49,13 @@ void loop(){
     julietbalcony.loop();
   break;
   case ROMI:
-    switch(scene){
-      case BALCONY:
-        romibalcony.loop();
-      break;
-      case FINALSCENE:
-        romifinal.loop();
-      break;
-    }
-  break;
+    // romibalcony.loop();
+    break;
   }
-}
+}*/
 
 //based on selected robot and scene the correct setup and loop will be run
-/*
+
 void setup() {
   //prints out which scene is running at start
   Serial.begin(115200);
@@ -106,6 +91,8 @@ void setup() {
   switch(robot){
     case ROMI:
       switch(scene){
+        default:  // added for testing servo
+        break;    // "                      "
         case FIGHT:
           romifight.setup();
         break;
@@ -171,7 +158,7 @@ void loop() {
       }
     break;
   }
-}*/
+}
 
 // Two households, both alike in dignity,
 // In fair Verona, where we lay our scene,

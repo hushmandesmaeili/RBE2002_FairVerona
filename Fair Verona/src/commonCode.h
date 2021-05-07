@@ -7,16 +7,19 @@
 #include "RemoteConstants.h"
 #include "IRdecoder.h"
 #include "tap_detector.h"
+#include "poison.h"
 // #include "LEDManager.h"
 
 class commonCode{
     public:
-        Chassis chassis;
+
+        Chassis* chassis;
         // Romi32U4ButtonA buttonA;
         Romi32U4ButtonB buttonB;
         Romi32U4ButtonC buttonC;
         // LEDManager ledmanager;
         TapDetector tapper;
+        Poison poison;
 
         void setup();
         void loop();

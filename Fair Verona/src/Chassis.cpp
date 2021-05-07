@@ -11,6 +11,16 @@ volatile int16_t countsLeft = 0;
 volatile int16_t countsRight = 0;
 Romi32U4Encoders encoders;
 
+Chassis* Chassis::pInstance;
+
+Chassis& Chassis::Instance(){
+    if (pInstance == nullptr)
+        pInstance = new Chassis();
+    return *Chassis::pInstance;
+}
+
+Chassis::Chassis(){}
+
 void Chassis::setup(){
     noInterrupts(); //disable interupts while we mess with the Timer4 registers
   

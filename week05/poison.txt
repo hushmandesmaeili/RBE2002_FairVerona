@@ -1,0 +1,11 @@
+
+
+Servo32u4 servo;
+
+void Poison::setup()
+{
+    servo.Init();
+    servo.Attach(); 
+    servo.SetMinMaxUS(900, 2100); 
+    pinMode(servoPotPin, INPUT);
+}
