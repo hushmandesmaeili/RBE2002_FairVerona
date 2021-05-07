@@ -11,11 +11,12 @@ class romiBalcony{
         typedef enum{
         IDLE,
         DRIVETOSTART,
+        TURNTOSTART,
         LOOKINGFORTAG,
         R2D2,
         TURNTODRIVE,
         DRIVETOBOTTOM,
-        TURNTOJULIET,
+        LOOKINGFORJULIET,
         FOLLOWJULIET,
         STOP,
         WAIT,
@@ -26,6 +27,6 @@ class romiBalcony{
 
     bool enteringState = 1;
     unsigned long timeLast, waitTime, printTime;
-    
-    
+    float thetaLast, turnAngle;
+    int count;
 };

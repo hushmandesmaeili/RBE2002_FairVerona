@@ -5,6 +5,8 @@
 
 Chassis chassis;
 
+uint32_t prevtime = 0; 
+
 void setup() {
     
     Serial.begin(115200);
@@ -17,13 +19,18 @@ void setup() {
 void loop() 
 {
     // chassis.FollowAprilTag(17);
-    // chassis.DetectAprilTag();
+    chassis.DetectAprilTag();
 
-    if (chassis.DetectAprilTag() == 1) {
-        chassis.FollowAprilTag(10);
-    } else if (chassis.DetectAprilTag() == 3) {
-        chassis.FollowAprilTag(15);
-    }
+    // if (millis() - prevtime > 500) {
+    //     prevtime = millis();
+    //     Serial.println(chassis.DetectAprilTag());
+    // }
+    
+    // if (chassis.DetectAprilTag() == 1) {
+    //     chassis.FollowAprilTag(10);
+    // } else if (chassis.DetectAprilTag() == 3) {
+    //     chassis.FollowAprilTag(15);
+    // }
 
     if(PIDController::readyToPID) //timer flag set
     {

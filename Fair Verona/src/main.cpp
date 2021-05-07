@@ -22,7 +22,7 @@ typedef enum {
   TYBALT,
   JULIET
 } Robot;
-Robot robot = ROMI; //set which robot you want it to be
+Robot robot = JULIET; //set which robot you want it to be
 
 typedef enum {
   FIGHT,
@@ -31,10 +31,63 @@ typedef enum {
 }  Scene;
 Scene scene = BALCONY; //set which scene it is
 
+/*void setup(){
+  Serial.begin(115200);
+  switch(robot){
+    case JULIET:
+      julietbalcony.setup();
+    break;
+    case ROMI:
+      // romibalcony.setup();
+    break;
+ }
+}
+
+void loop(){
+  switch(robot){
+  case JULIET:
+    julietbalcony.loop();
+  break;
+  case ROMI:
+    // romibalcony.loop();
+    break;
+  }
+}*/
+
 //based on selected robot and scene the correct setup and loop will be run
 
 void setup() {
-  // julietBalcony.c.setup();
+  //prints out which scene is running at start
+  Serial.begin(115200);
+
+  switch(robot){
+    case ROMI:
+      Serial.print(F("ROMI"));
+    break;
+    case TYBALT:
+      Serial.print(F("TYBALT"));
+    break;
+    case MERCUTIO:
+      Serial.print(F("MERCOOLIO"));
+    break;
+    case JULIET:
+      Serial.print(F("JULIET"));
+    break;
+  }
+  Serial.print(" ");
+  switch(scene){
+    case FIGHT:
+      Serial.println(F("FIGHT"));
+    break;
+    case BALCONY:
+      Serial.println(F("BALCONY"));
+    break;
+    case FINALSCENE:
+      Serial.println(F("FINAL"));
+    break;
+  }
+
+
   switch(robot){
     case ROMI:
       switch(scene){
@@ -64,6 +117,9 @@ void setup() {
         break;
         case FINALSCENE:
           julietfinal.setup();
+        break;
+        default:
+          Serial.println(F("incorrect selection"));
         break;
       }
     break;
