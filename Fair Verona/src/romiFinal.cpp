@@ -4,9 +4,7 @@ void romiFinal::setup(){
     c.tapDetectorOn = 1;
     c.setup();
     enteringState = 1;
-    state = WAIT;
-    nextState = DRIVETOJULIETDISTANCE;
-    waitTime = 3000;
+    state = IDLE;
     //TURN LED ON
 }
 
@@ -39,7 +37,7 @@ void romiFinal::loop() {
 
     case IDLE:
 
-        // ADD decoder
+        if(c.remoteCode == remotePlayPause) state = DRIVETOJULIETDISTANCE;
             
     break;
 

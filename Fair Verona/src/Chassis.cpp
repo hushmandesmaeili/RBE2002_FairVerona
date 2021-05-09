@@ -325,10 +325,10 @@ void Chassis::FollowAprilTag(float targetDistance) {
     float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
     static float lastTag = 0;      //last millis a tag was read
     
-    lastTag = millis();
     uint8_t tagCount = getTagCount();
     if(tagCount) 
     {
+        lastTag = millis();
         if(readTag(&tag)) {
             float errorDistance =  getDistanceCam(tag.w) - tDistance;
             float errorXTranslation = getDeltaCXCam(tag.cx);
@@ -344,34 +344,78 @@ void Chassis::FollowAprilTag(float targetDistance) {
 }
 
 //Cannot read past 25 cm
-void Chassis::FollowAprilTag(float targetDistance, float maxSpeed) { //float distance float max speed
+void Chassis::FollowAprilTag(float targetDistance, float maxSpeed) {
 
     float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
     static float lastTag = 0;      //last millis a tag was read
+    
     uint8_t tagCount = getTagCount();
     if(tagCount) 
     {
         lastTag = millis();
         if(readTag(&tag)) {
-            
             float errorDistance =  getDistanceCam(tag.w) - tDistance;
             float errorXTranslation = getDeltaCXCam(tag.cx);
 
             targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
             targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
 
-            if (abs(targetSpeedLeft) > maxSpeed)
-                targetSpeedLeft = maxSpeed;
-
-            if (abs(targetSpeedRight) > maxSpeed)
-                targetSpeedRight = maxSpeed;
+            if(abs(targetSpeedLeft) > maxSpeed || (abs(targetSpeedRight) > maxSpeed)){ //when speeds are too big, reduce
+                if(targetSpeedLeft > 0 || targetSpeedRight > 0){
+                    if(targetSpeedLeft > targetSpeedRight){ //positive speeds
+                        targetSpeedRight = targetSpeedRight * (maxSpeed / targetSpeedLeft);
+                        targetSpeedLeft = maxSpeed;
+                    } else {
+                        targetSpeedLeft = targetSpeedLeft * (maxSpeed / targetSpeedRight);
+                        targetSpeedRight = maxSpeed;
+                    }
+                } else {
+                    if(targetSpeedLeft < targetSpeedRight){ //negative speeds
+                        targetSpeedRight = -targetSpeedRight * (maxSpeed / targetSpeedLeft);
+                        targetSpeedLeft = -maxSpeed;
+                    } else {
+                        targetSpeedLeft = -targetSpeedLeft * (maxSpeed / targetSpeedRight);
+                        targetSpeedRight = -maxSpeed;
+                    }
+                }
+            }
         }
-    } 
+    }
     else if (millis() - lastTag > CAMERA_TIMEOUT) {
         targetSpeedLeft = 0;
         targetSpeedRight = 0;
     }
 }
+
+// //Cannot read past 25 cm
+// void Chassis::FollowAprilTag(float targetDistance, float maxSpeed) { //float distance float max speed
+
+//     float tDistance = targetDistance + CAMERA_OFFSET; //target distance plus camera offset from front
+//     static float lastTag = 0;      //last millis a tag was read
+//     uint8_t tagCount = getTagCount();
+//     if(tagCount) 
+//     {
+//         lastTag = millis();
+//         if(readTag(&tag)) {
+            
+//             float errorDistance =  getDistanceCam(tag.w) - tDistance;
+//             float errorXTranslation = getDeltaCXCam(tag.cx);
+
+//             targetSpeedLeft = errorDistance * kp_distance - errorXTranslation * kp_alignment;
+//             targetSpeedRight = errorDistance * kp_distance + errorXTranslation * kp_alignment;
+
+//             if (abs(targetSpeedLeft) > maxSpeed)
+//                 targetSpeedLeft = maxSpeed;
+
+//             if (abs(targetSpeedRight) > maxSpeed)
+//                 targetSpeedRight = maxSpeed;
+//         }
+//     } 
+//     else if (millis() - lastTag > CAMERA_TIMEOUT) {
+//         targetSpeedLeft = 0;
+//         targetSpeedRight = 0;
+//     }
+// }
 
 float Chassis::getDistanceCamera() {
     float distance = 33;                //not zero, larger than 30
@@ -384,6 +428,9 @@ float Chassis::getDistanceCamera() {
 
     return distance;
 }
+
+
+
 
 int Chassis::DetectAprilTag() {
 

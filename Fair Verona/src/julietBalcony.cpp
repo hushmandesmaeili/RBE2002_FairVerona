@@ -6,9 +6,7 @@ void julietBalcony::setup(){
     c.chassis->checkRampEnable = 1;
 
     // c.chassis->SetTargetPosition(60.0, 0.0);
-    state = WAIT;
-    nextState = APPROACH;
-    waitTime = 3000;
+    state = IDLE;
     // pinMode(13, OUTPUT);
 }
 
@@ -45,8 +43,12 @@ void julietBalcony::loop(){
                 c.chassis->GetXAverage();
             }
 
-            // if(c.remoteCode == remotePlayPause) state = APPROACH;
-            if(c.buttonB.getSingleDebouncedPress()) state = APPROACH;
+            if(c.remoteCode == remotePlayPause) {
+                state = WAIT;
+                nextState = APPROACH;
+                waitTime = 3000;
+            }
+            // if(c.buttonB.getSingleDebouncedPress()) state = APPROACH;
         break;
 
         case APPROACH:

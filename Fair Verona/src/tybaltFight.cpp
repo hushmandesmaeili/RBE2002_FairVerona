@@ -4,9 +4,9 @@ void tybaltFight::setup() {
     c.tapper.fastSettingsEnable = 0;
     c.setup();
     
-    state = WAIT;
-    nextState = CIRCLE;
-    waitTime = 3000;
+    state = IDLE;
+    // nextState = CIRCLE;
+    // waitTime = 3000;
 }
 
 void tybaltFight::loop(){
@@ -20,9 +20,7 @@ void tybaltFight::loop(){
     switch(state) {
 
         case IDLE:
-            if(enteringState){
-                enteringState = 0;
-            }
+            if(c.remoteCode == remotePlayPause) state = CIRCLE;
         break;
 
         case CIRCLE:
@@ -52,26 +50,46 @@ void tybaltFight::loop(){
                 c.chassis->setMotorSpeeds(0, 0);
                 enteringState = 1;
                 state = WAIT;
-                nextState = DRIVETOMERCOOLIO;
+                nextState = DRIVETOTAG;
                 waitTime = 1000;
+            }
+            
+        break;
+
+        case DRIVETOTAG:
+            c.chassis->setMotorSpeeds(20, 20);
+
+            // state = WAIT;
+            // nextState = DRIVETOMERCOOLIO;
+            // waitTime = 500;
+
+            if (c.chassis->DetectAprilTag() != -1) {
+                enteringState = 1;
+                state = DRIVETOMERCOOLIO;
             }
             
         break;
 
         case DRIVETOMERCOOLIO:
             if(enteringState) {
+                timeLast = millis();
                 enteringState = 0;
             }
 
-            c.chassis->FollowAprilTag(-6, 20);
+            c.chassis->FollowAprilTag(-6, 25);
 
-            if (c.tapper.CheckTap()) {
+            distance = c.chassis->getDistanceCamera();
+            if(distance != 33) distanceLast = distance;
+
+            if (distanceLast < 0 && c.tapper.CheckTap()) {
+            // if (millis() - timeLast > 500 && c.tapper.CheckTap()) {
                 enteringState = 1;
+                c.chassis->setMotorSpeeds(0, 0);
                 state = WAIT;
+                // c.simpleLED.off();
                 nextState = WAITTODIE;
                 waitTime = 1000;
             }
-            
         break;
 
         case WAITTODIE:

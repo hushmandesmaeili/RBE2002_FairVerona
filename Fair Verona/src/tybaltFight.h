@@ -12,6 +12,7 @@ class tybaltFight{
         IDLE,
         CIRCLE,
         TURNTOMERCOOLIO,
+        DRIVETOTAG,
         DRIVETOMERCOOLIO,
         WAITTODIE,
         STOP,
@@ -25,4 +26,5 @@ class tybaltFight{
     unsigned long timeLast, waitTime, printTime;
     float thetaLast, turnAngle;
     int count;
+    float distance, distanceLast;
 };

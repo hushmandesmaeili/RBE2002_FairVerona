@@ -35,8 +35,7 @@ void romiBalcony::loop(){
                 enteringState = 0;
                 c.chassis->setMotorSpeeds(0,0);
             }
-            // if(c.remoteCode == remote1){
-            if(c.buttonB.getSingleDebouncedPress()){
+            if(c.remoteCode == remotePlayPause){
                 state = DRIVETOSTART;
                 enteringState = 1;
             }

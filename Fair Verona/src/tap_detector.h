@@ -14,7 +14,7 @@ public:
   void Init(void);
   bool CheckTap(void);
 
-  bool fastSettingsEnable = 1;
+  bool fastSettingsEnable = 0;
 };
 
 #endif

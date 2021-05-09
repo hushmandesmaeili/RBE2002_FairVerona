@@ -2,24 +2,40 @@
 
 void romiFight::setup() {
     c.setup();
-    state = WAIT;
-    nextState = DRIVETOTAG;
-    waitTime = 3000;
+    state = IDLE;
+    // nextState = DRIVETOTAG;
+    // waitTime = 14000;
 }
 
 void romiFight::loop(){
     if(millis() - printTime > 500){
-        // Serial.print(c.chassis->theta);
-        // Serial.print("\n");
+        distance = c.chassis->getDistanceCamera();
+        if(distance != 33.00){
+            Serial.print(distance);
+            Serial.println();
+        }
     }
 
     c.loop();
 
     switch(state) {
 
+        case TEST:
+        // distance = c.chassis->getDistanceCamera();
+        // if(distance != 33.00){
+        //     Serial.print(distance);
+        //     Serial.println();
+        // }
+            // c.chassis->FollowAprilTag(-6, 25);
+        break;
+
         case IDLE:
-            if(enteringState){
-                enteringState = 0;
+            if(c.remoteCode == remotePlayPause) {
+                state = WAIT;
+                nextState = DRIVETOTAG;
+                waitTime = 20000;
+                // waitTime = 3000;
+                c.poison.down();
             }
         break;
 
@@ -30,19 +46,32 @@ void romiFight::loop(){
             }
 
             if (c.chassis->DetectAprilTag() != -1) {
-                enteringState = 1;;
+                enteringState = 1;
                 state = DRIVETOTYBALT;
+                // state = WAIT;
+                // nextState = DRIVETOTYBALT;
+                // waitTime = 750;
             }
             
         break;
 
         case DRIVETOTYBALT:
-            c.chassis->FollowAprilTag(0, 20);
+            if(enteringState) {
+                timeLast = millis();
+                enteringState = 0;
+            }
 
-            if (c.tapper.CheckTap()) {
+            c.chassis->FollowAprilTag(-9, 25);
+
+            distance = c.chassis->getDistanceCamera();
+            if(distance != 33) distanceLast = distance;
+
+            if (distanceLast < 0 && c.tapper.CheckTap()) {
+            // if (millis() - timeLast > 750 && c.tapper.CheckTap()) {
                 enteringState = 1;
                 c.chassis->setMotorSpeeds(0, 0);
                 state = WAIT;
+                // c.simpleLED.off();
                 nextState = BACKAWAY;
                 waitTime = 1000;
             }
@@ -52,12 +81,14 @@ void romiFight::loop(){
         case BACKAWAY:
             if(enteringState) {
                 enteringState = 0;
+                c.chassis->resetPose();
                 c.chassis->setMotorSpeeds(-10, -10);
             }
 
             if (c.chassis->x < (-5.0)) {
                 enteringState = 1;
                 c.chassis->setMotorSpeeds(0, 0);
+                // c.simpleLED.on();
                 state = TURNTOLEAVE;
             }
             
@@ -69,7 +100,7 @@ void romiFight::loop(){
                 c.chassis->setMotorSpeeds(-10, 10);
             }
 
-            if (c.chassis->theta > (3.14 / 3)) {
+            if (c.chassis->theta > (3.14 / 2)) {
                 enteringState = 1;
                 c.chassis->setMotorSpeeds(0, 0);
                 state = EXITSCENE;

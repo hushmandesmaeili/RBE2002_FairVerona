@@ -14,6 +14,11 @@ void Poison::up(){
     setPoint = UP;
 }
 
+void Poison::upish(){
+    servo.Write(1400);
+    setPoint = UP;
+}
+
 //Dumping poisition
 void Poison::down(){
     servo.Write(900);

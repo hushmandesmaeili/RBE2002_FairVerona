@@ -7,7 +7,7 @@ void julietFinal::setup() {
     enteringState = 1;
     state = WAIT;
     nextState = WAITFORCOLLISION;
-    waitTime = 3000;
+    waitTime = 2000;
 }
 
 void julietFinal::loop() {
@@ -30,8 +30,7 @@ void julietFinal::loop() {
     break;
 
     case IDLE:
-
-        // ADD decoder
+        if(c.remoteCode == remotePlayPause) state = WAITFORCOLLISION;
             
     break;
 

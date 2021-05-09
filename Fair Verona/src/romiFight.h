@@ -24,4 +24,5 @@ class romiFight{
 
         bool enteringState = 1;
         unsigned long timeLast, waitTime, printTime;
+        float distance, distanceLast;
 };

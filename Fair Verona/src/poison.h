@@ -6,6 +6,7 @@ class Poison {
     public:
         void setup(void);
         void up(void);
+        void upish(void);
         void down(void);
         bool done(void);
 

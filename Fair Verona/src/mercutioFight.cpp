@@ -1,11 +1,12 @@
 #include "mercutioFight.h"
 
 void mercutioFight::setup(){
+    c.tapper.fastSettingsEnable = 0;
     c.setup();
 
-    state = WAIT;
-    nextState = CIRCLE;
-    waitTime = 3000;
+    state = IDLE;
+    // nextState = CIRCLE;
+    // waitTime = 3000;
 }
 
 void mercutioFight::loop(){
@@ -19,7 +20,7 @@ void mercutioFight::loop(){
     switch(state) {
 
         case IDLE:
-
+            if(c.remoteCode == remotePlayPause) state = CIRCLE;
         break;
 
         case CIRCLE:
@@ -31,7 +32,9 @@ void mercutioFight::loop(){
             if (c.chassis->theta > (6 * 3.14)) {
                 enteringState = 1;
                 c.chassis->setMotorSpeeds(0, 0);
-                state = WAITTODIE;
+                state = WAIT;
+                nextState = WAITTODIE;
+                waitTime = 1000;
             }
             
         break;
