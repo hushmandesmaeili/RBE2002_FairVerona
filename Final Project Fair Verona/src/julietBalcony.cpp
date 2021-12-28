@@ -13,14 +13,15 @@ void julietBalcony::setup(){
 
 void julietBalcony::loop(){
     if(millis() - printTime > 100){
-        Serial.print(state);
-        Serial.print(F("\t"));
-        Serial.print(c.chassis->estimatedPitchAng);
-        Serial.print(F("\n"));
+        // Serial.print(state);
+        // Serial.print(F("\t"));
+        //Serial.print(c.chassis->getPitchAng());
+        //Serial.print(F("\n"));
         // Serial.print(c.chassis->th_target);
         // Serial.print(F("\t"));
         // Serial.print(c.chassis->AtTargetPosition());
         // Serial.print(F("\t"));
+        printTime = millis();
     }
 
     c.loop();

@@ -36,6 +36,7 @@ class Chassis{
         float getDistance();
         void FollowAprilTag(float targetDistance, float maxSpeed);
         float getDistanceCamera();
+        float getPitchAng(void);
         // int16_t getCountsLeft(void);
         // int16_t getCountsRight(void);
 
@@ -67,7 +68,6 @@ class Chassis{
 
         void collisionDetect(void);
         bool UpdatePitch(void);
-        float getPitchAng(void);
         void wallFollower(void);
         // void updateSpeeds(void);
         // float getDistance();
@@ -148,9 +148,9 @@ class Chassis{
         
         float pitchLast;
         const float  dataRateSec = 0.077;
-        const float  sensitivity = 35;  //sensitivity of gyro in mdps/LSB
-        float senseRad = (sensitivity * PI)/(180000); // rads per second per LSB
-        const float kappa = 0.5;
+        const float  sensitivity = 0.035;  //sensitivity of gyro in mdps/LSB
+        float senseRad = (sensitivity * PI)/(180.); // rads per second per LSB
+        const float kappa = 0.85;
 
         float accXoffset = 0;
         float accZoffset = 0;

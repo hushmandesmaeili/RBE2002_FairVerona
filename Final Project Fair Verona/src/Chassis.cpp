@@ -234,7 +234,7 @@ void Chassis::wallFollower(void){
             targetSpeedLeft =  - (targetSpeed + turnEffort);
             targetSpeedRight = - (targetSpeed - turnEffort);
         }
-        Serial.println(F("WALLFOLLOWER"));
+        // Serial.println(F("WALLFOLLOWER"));
         
        
     }
@@ -252,13 +252,19 @@ bool Chassis::UpdatePitch(void) {
     
     if (imu.getStatus() & 0x01) {
         imu.read();
+        Serial.print(imu.a.x);
+        Serial.print('\t');
+        Serial.print(imu.a.z);
+        Serial.print('\t');
+        Serial.print(imu.g.y);
+        Serial.print('\t');
         float predictGyro = estimatedPitchAng + (dataRateSec * (imu.g.y - Bias) * senseRad);
         float obsPitch = atan2((double)(imu.a.x - accXoffset),(double)(imu.a.z));
         estimatedPitchAng = kappa * predictGyro + (1 - kappa) * obsPitch;
         Bias = Bias + E*(predictGyro - obsPitch); 
 
-        // Serial.print(estimatedPitchAng);
-        // Serial.print("\n"); 
+        Serial.print(estimatedPitchAng);
+        Serial.print("\n"); 
         
         return true;    
     }
